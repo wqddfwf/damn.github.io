@@ -477,9 +477,6 @@
       
       /* 改进添加按钮样式 */
       .add-button {
-          position: fixed;
-          bottom: calc(24px + env(safe-area-inset-bottom));
-          right: 24px;
           width: 60px;
           height: 60px;
           background: linear-gradient(135deg, var(--primary-blue), #0066CC);
@@ -492,7 +489,6 @@
           box-shadow: 0 4px 16px rgba(0,122,255,0.3);
           border: none;
           cursor: pointer;
-          z-index: 10;
           transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
       }
       
@@ -1360,6 +1356,15 @@
                 </div>
             </div>
             
+            <!-- 添加记录按钮居中放置在概况下方 -->
+            <div style="display: flex; justify-content: center; margin: 20px 0;">
+                <button class="add-button" id="addButton" style="position: static; box-shadow: 0 4px 16px rgba(0,122,255,0.3);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 6V12M12 12V18M12 12H18M12 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            
             <div class="records-header">
                 <div class="records-title">记录</div>
                 <div class="export-dropdown">
@@ -1378,12 +1383,6 @@
             <div class="records-list" id="recordsList">
                 <div class="no-records">暂无记录</div>
             </div>
-            
-            <button class="add-button" id="addButton">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 6V12M12 12V18M12 12H18M12 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-            </button>
             
             <!-- 添加记录模态框 -->
             <div class="modal" id="addModal">
