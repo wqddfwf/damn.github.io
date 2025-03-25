@@ -554,14 +554,14 @@
       }
       
       .form-group input {
-          width: 100%;
-          padding: 12px;  /* 减小内边距 */
+          width: 90%;  /* 缩小宽度从100%到90%，适配苹果手机 */
+          padding: 10px;  /* 减小内边距 */
           border: 1px solid rgba(0,0,0,0.05);
           border-radius: 10px;  /* 减小圆角 */
-          font-size: 15px;  /* 减小字体大小 */
+          font-size: 16px;  /* 减小字体大小 */
           background-color: rgba(242, 242, 247, 0.6);
           transition: all 0.2s;
-          height: 44px;  /* 保持iOS触控友好高度 */
+          height: 40px;  /* 减小高度 */
       }
       
       .form-group input:focus {
@@ -838,8 +838,8 @@
       
       /* 金额输入优化 */
       .form-group input[type="number"] {
-          width: 100%;
-          padding: 12px;  /* 减小内边距 */
+          width: 90%;  /* 缩小宽度从100%到90%，适配苹果手机 */
+          padding: 10px;  /* 减小内边距 */
           border: 1px solid rgba(0,0,0,0.05);
           border-radius: 10px;  /* 减小圆角 */
           font-size: 16px;  /* 减小字体大小 */
@@ -848,7 +848,7 @@
           -webkit-appearance: none; /* 移除iOS默认样式 */
           appearance: none;
           box-shadow: none;
-          height: 44px;  /* 固定合适高度 */
+          height: 40px;  /* 减小高度 */
       }
       
       .form-group input[type="number"]:focus {
@@ -1398,6 +1398,7 @@
                             <div class="type-options" id="typeOptions">
                                 <div class="type-option" data-type="收入-吃喝岭师">收入-吃喝岭师</div>
                                 <div class="type-option" data-type="收入-24个半">收入-24个半</div>
+                                <div class="type-option" data-type="收入-个人预约">收入-个人预约</div>
                                 <div class="type-option" data-type="费用-食材">费用-食材</div>
                                 <div class="type-option" data-type="费用-交通">费用-交通</div>
                             </div>
