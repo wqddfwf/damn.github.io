@@ -1687,11 +1687,23 @@
             });
             
             document.getElementById('todayButton').addEventListener('click', () => {
-                const today = new Date().toISOString().split('T')[0];
-                selectedDate = today;
-                datePicker.value = today;
-                dateDisplay.textContent = formatDate(today);
+                const today = new Date();
+                // 修复时区问题：格式化为YYYY-MM-DD格式，手动处理以避免时区偏移
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                selectedDate = `${yyyy}-${mm}-${dd}`;
+                
+                datePicker.value = selectedDate;
+                dateDisplay.textContent = formatDate(selectedDate);
                 updateUI();
+                
+                // 添加选择确认的视觉效果
+                const dateDisplayElement = document.querySelector('.date-display');
+                dateDisplayElement.classList.add('date-selected');
+                setTimeout(() => {
+                    dateDisplayElement.classList.remove('date-selected');
+                }, 500);
             });
             
             datePicker.addEventListener('change', (e) => {
@@ -1722,6 +1734,10 @@
                 currentCalendarMonth = today.getMonth();
                 currentCalendarYear = today.getFullYear();
                 renderCalendar(currentCalendarYear, currentCalendarMonth);
+                
+                // 选择今天的日期
+                // 使用本地时间而不是UTC时间，避免时区问题
+                selectDate(today.getFullYear(), today.getMonth(), today.getDate());
             });
             
             document.getElementById('closeCalendarBtn').addEventListener('click', () => {
@@ -2616,10 +2632,11 @@
                 dayElement.classList.add('calendar-day', 'other-month');
                 dayElement.textContent = prevMonthLastDay - i;
                 
-                // 添加点击事件
+                // 添加点击事件 - 修复：使用闭包保存当前的值
+                const currentDay = prevMonthLastDay - i; // 保存当前日期值
                 const prevMonth = month === 0 ? 11 : month - 1;
                 const prevYear = month === 0 ? year - 1 : year;
-                dayElement.addEventListener('click', () => selectDate(prevYear, prevMonth, prevMonthLastDay - i));
+                dayElement.addEventListener('click', () => selectDate(prevYear, prevMonth, currentDay));
                 
                 calendarDays.appendChild(dayElement);
             }
@@ -2640,8 +2657,9 @@
                     dayElement.classList.add('selected');
                 }
                 
-                // 添加点击事件
-                dayElement.addEventListener('click', () => selectDate(year, month, i));
+                // 添加点击事件 - 修复：使用闭包保存当前的i值
+                const currentDay = i; // 保存当前日期值
+                dayElement.addEventListener('click', () => selectDate(year, month, currentDay));
                 
                 calendarDays.appendChild(dayElement);
             }
@@ -2655,10 +2673,11 @@
                 dayElement.classList.add('calendar-day', 'other-month');
                 dayElement.textContent = i;
                 
-                // 添加点击事件
+                // 添加点击事件 - 修复：使用闭包保存当前的i值
+                const currentDay = i; // 保存当前日期值
                 const nextMonth = month === 11 ? 0 : month + 1;
                 const nextYear = month === 11 ? year + 1 : year;
-                dayElement.addEventListener('click', () => selectDate(nextYear, nextMonth, i));
+                dayElement.addEventListener('click', () => selectDate(nextYear, nextMonth, currentDay));
                 
                 calendarDays.appendChild(dayElement);
             }
@@ -2666,9 +2685,15 @@
         
         // 选择日期
         function selectDate(year, month, day) {
-            // 格式化日期为YYYY-MM-DD格式
+            // 使用本地时间而不是UTC时间
+            // 创建新的日期对象并设置年月日（不使用时分秒）
             const date = new Date(year, month, day);
-            const formattedDate = date.toISOString().split('T')[0];
+            
+            // 格式化为YYYY-MM-DD格式，使用本地时间
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            const formattedDate = `${yyyy}-${mm}-${dd}`;
             
             // 更新选中日期
             selectedDate = formattedDate;
@@ -2789,9 +2814,18 @@
             
             confirmBtn.addEventListener('click', () => {
                 if (dateInput.value) {
-                    datePicker.value = dateInput.value;
-                    selectedDate = dateInput.value;
-                    document.querySelector('.date-display-text').textContent = formatDate(dateInput.value);
+                    // 确保日期格式正确
+                    const inputDate = new Date(dateInput.value);
+                    
+                    // 格式化为YYYY-MM-DD，避免时区问题
+                    const yyyy = inputDate.getFullYear();
+                    const mm = String(inputDate.getMonth() + 1).padStart(2, '0');
+                    const dd = String(inputDate.getDate()).padStart(2, '0');
+                    const formattedDate = `${yyyy}-${mm}-${dd}`;
+                    
+                    datePicker.value = formattedDate;
+                    selectedDate = formattedDate;
+                    document.querySelector('.date-display-text').textContent = formatDate(formattedDate);
                     updateUI();
                 }
                 overlay.remove();
