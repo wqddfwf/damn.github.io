@@ -25,6 +25,9 @@
   <!-- 添加SheetJS库用于Excel导出 -->
   <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
   
+  <!-- 添加Chart.js用于图表 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  
   <!-- 添加Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap" rel="stylesheet">
   
@@ -76,7 +79,7 @@
           align-items: center;
       }
       
-      .logout-button {
+      .logout-button, .details-button {
           background: none;
           border: none;
           cursor: pointer;
@@ -85,7 +88,7 @@
           align-items: center;
       }
       
-      .logout-button:hover {
+      .logout-button:hover, .details-button:hover {
           background-color: var(--system-gray-2);
           border-radius: 50%;
       }
@@ -165,33 +168,88 @@
       .date-picker {
           margin-bottom: 20px;
           background-color: var(--white);
-          padding: 16px;
+          padding: 16px 20px;
           border-radius: 12px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
           display: flex;
-          justify-content: space-between;
-          align-items: center;
+          flex-direction: column;
+          gap: 12px;
+          -webkit-tap-highlight-color: transparent;
+          position: relative;
       }
       
-      .date-picker-button {
+      .date-navigation {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+      }
+      
+      .date-display {
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--black);
+          min-width: 120px;
+          text-align: center;
+      }
+      
+      .nav-button {
           background: none;
           border: none;
-          padding: 8px;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--primary-blue);
+          cursor: pointer;
+          transition: background-color 0.2s;
+      }
+      
+      .nav-button:active {
+          background-color: var(--system-gray-2);
+      }
+      
+      .date-actions {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+      }
+      
+      .today-button {
+          background-color: var(--system-gray-1);
+          padding: 8px 12px;
+      }
+      
+      .ios-button {
+          background-color: var(--system-gray-1);
+          border: none;
+          padding: 8px 16px;
+          border-radius: 8px;
+          font-size: 15px;
+          color: var(--primary-blue);
+          font-weight: 500;
           cursor: pointer;
           display: flex;
           align-items: center;
-          gap: 8px;
-          font-size: 16px;
-          color: var(--primary-blue);
+          gap: 6px;
+          transition: background-color 0.2s;
       }
       
-      .date-picker-button:hover {
+      .ios-button:active {
           background-color: var(--system-gray-2);
-          border-radius: 8px;
+          transform: scale(0.98);
       }
       
       .hidden-date-input {
-          display: none;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 1px;
+          height: 1px;
+          opacity: 0;
+          pointer-events: none;
       }
       
       .summary-card {
@@ -405,6 +463,9 @@
           font-size: 20px;
           font-weight: 600;
           border-bottom: 1px solid var(--system-gray-1);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
       }
       
       .modal-body {
@@ -509,6 +570,92 @@
           background-color: rgba(255,59,48,0.1);
       }
 
+      /* 详细数据模态框 */
+      .details-modal-content {
+          max-width: 600px;
+          width: calc(100% - 40px);
+          max-height: 80vh;
+          overflow-y: auto;
+      }
+      
+      .range-picker {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 20px;
+      }
+      
+      .range-picker input {
+          flex: 1;
+          padding: 12px;
+          border: 1px solid var(--system-gray-2);
+          border-radius: 8px;
+          font-size: 16px;
+          background-color: var(--system-gray-1);
+      }
+      
+      .chart-container {
+          margin: 20px 0;
+          padding: 20px;
+          background-color: var(--white);
+          border-radius: 16px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      }
+      
+      .chart-title {
+          font-size: 17px;
+          color: var(--system-gray-4);
+          margin-bottom: 20px;
+          text-align: center;
+          font-weight: 500;
+      }
+      
+      .chart-wrapper {
+          position: relative;
+          height: 300px;
+          margin-bottom: 20px;
+      }
+      
+      .chart-summary {
+          display: flex;
+          justify-content: space-between;
+          padding: 16px;
+          background-color: var(--system-gray-1);
+          border-radius: 12px;
+          margin-top: 16px;
+      }
+      
+      .chart-summary-item {
+          text-align: center;
+          flex: 1;
+      }
+      
+      .chart-summary-label {
+          font-size: 14px;
+          color: var(--system-gray-4);
+          margin-bottom: 4px;
+      }
+      
+      .chart-summary-value {
+          font-size: 18px;
+          font-weight: 600;
+      }
+      
+      .chart-summary-value.income {
+          color: var(--primary-green);
+      }
+      
+      .chart-summary-value.expense {
+          color: var(--primary-red);
+      }
+      
+      .chart-summary-value.profit {
+          color: var(--primary-blue);
+      }
+      
+      canvas {
+          max-width: 100%;
+      }
+
       /* 针对iOS PWA的优化 */
       @supports (-webkit-touch-callout: none) {
           body {
@@ -601,6 +748,9 @@
               flex-direction: column;
               gap: 12px;
           }
+          .range-picker {
+              flex-direction: column;
+          }
       }
   </style>
 </head>
@@ -636,6 +786,11 @@
         <!-- 主应用内容 (默认隐藏，登录后显示) -->
         <div id="appContent" style="display: none;">
             <div class="header">
+                <button class="details-button" id="detailsButton" title="详细数据">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 7H21M3 12H21M3 17H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
                 <span>每日记账</span>
                 <button class="logout-button" id="logoutButton" title="退出登录">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -645,13 +800,28 @@
             </div>
             
             <div class="date-picker">
-                <span id="dateDisplay"></span>
-                <button class="date-picker-button" id="datePickerButton">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 10H4M16 2V6M8 2V6M3 6H21V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    选择日期
-                </button>
+                <div class="date-navigation">
+                    <button class="nav-button" id="prevDayButton" title="前一天">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="date-display" id="dateDisplay"></div>
+                    <button class="nav-button" id="nextDayButton" title="后一天">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="date-actions">
+                    <button class="ios-button today-button" id="todayButton">今天</button>
+                    <button class="ios-button" id="datePickerButton">
+                        <span>选择日期</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
                 <input type="date" id="datePicker" class="hidden-date-input">
             </div>
             
@@ -723,6 +893,54 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 详细数据模态框 -->
+            <div class="modal" id="detailsModal">
+                <div class="details-modal-content">
+                    <div class="modal-header">
+                        <span>详细数据</span>
+                        <button class="btn btn-cancel" id="detailsCloseBtn">关闭</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="range-picker">
+                            <input type="date" id="startDate" placeholder="开始日期">
+                            <input type="date" id="endDate" placeholder="结束日期">
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">近7天利润趋势</div>
+                            <div class="chart-wrapper">
+                                <canvas id="profitChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">近7天收入趋势</div>
+                            <div class="chart-wrapper">
+                                <canvas id="incomeChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-title">近7天费用趋势</div>
+                            <div class="chart-wrapper">
+                                <canvas id="expenseChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-summary">
+                            <div class="chart-summary-item">
+                                <div class="chart-summary-label">总收入</div>
+                                <div class="chart-summary-value income" id="totalIncome">0.00</div>
+                            </div>
+                            <div class="chart-summary-item">
+                                <div class="chart-summary-label">总费用</div>
+                                <div class="chart-summary-value expense" id="totalExpense">0.00</div>
+                            </div>
+                            <div class="chart-summary-item">
+                                <div class="chart-summary-label">总利润</div>
+                                <div class="chart-summary-value profit" id="totalProfit">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -781,6 +999,7 @@
         let currentUser = null;
         let isOnline = navigator.onLine;
         let selectedType = null;
+        let profitChart, incomeChart, expenseChart;
 
         // DOM元素
         const datePicker = document.getElementById('datePicker');
@@ -813,6 +1032,13 @@
         const resetSubmitBtn = document.getElementById('resetSubmitBtn');
         const offlineNotice = document.getElementById('offlineNotice');
         const logoutButton = document.getElementById('logoutButton');
+        const detailsButton = document.getElementById('detailsButton');
+        const detailsModal = document.getElementById('detailsModal');
+        const detailsCloseBtn = document.getElementById('detailsCloseBtn');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const detailsExportCsvBtn = document.getElementById('detailsExportCsv');
+        const detailsExportExcelBtn = document.getElementById('detailsExportExcel');
 
         // 显示/隐藏加载指示器
         function showLoader(show, text = "数据加载中...") {
@@ -852,6 +1078,7 @@
                 localStorage.removeItem('pendingChanges');
                 await loadRecordsFromFirebase();
                 updateUI();
+                updateDetailsCharts();
             } catch (error) {
                 console.error("同步失败:", error);
             } finally {
@@ -865,10 +1092,76 @@
             datePicker.value = selectedDate;
             dateDisplay.textContent = formatDate(selectedDate);
             
+            // 日期导航按钮实现
+            document.getElementById('prevDayButton').addEventListener('click', () => {
+                navigateDate(-1);
+            });
+            
+            document.getElementById('nextDayButton').addEventListener('click', () => {
+                navigateDate(1);
+            });
+            
+            document.getElementById('todayButton').addEventListener('click', () => {
+                const today = new Date().toISOString().split('T')[0];
+                selectedDate = today;
+                datePicker.value = today;
+                dateDisplay.textContent = formatDate(today);
+                updateUI();
+            });
+            
+            // 日期选择器实现
+            datePickerButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // 在iOS上模拟原生日期选择器体验
+                if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) {
+                    // 创建一个更自然的覆盖层
+                    const overlay = document.createElement('div');
+                    overlay.style.position = 'fixed';
+                    overlay.style.top = '0';
+                    overlay.style.left = '0';
+                    overlay.style.right = '0';
+                    overlay.style.bottom = '0';
+                    overlay.style.backgroundColor = 'rgba(0,0,0,0.4)';
+                    overlay.style.zIndex = '999';
+                    overlay.style.display = 'flex';
+                    overlay.style.justifyContent = 'center';
+                    overlay.style.alignItems = 'flex-end';
+                    document.body.appendChild(overlay);
+                    
+                    // 日期选择器直接触发
+                    datePicker.click();
+                    
+                    // 监听日期变化或点击覆盖层移除
+                    overlay.addEventListener('click', () => {
+                        document.body.removeChild(overlay);
+                    });
+                    
+                    datePicker.addEventListener('change', () => {
+                        if (document.body.contains(overlay)) {
+                            document.body.removeChild(overlay);
+                        }
+                    }, { once: true });
+                } else {
+                    // 非iOS设备直接触发
+                    datePicker.click();
+                }
+            });
+            
+            datePicker.addEventListener('change', (e) => {
+                selectedDate = e.target.value;
+                dateDisplay.textContent = formatDate(selectedDate);
+                updateUI();
+            });
+            
+            // 检查自动登录
+            await checkAutoLogin();
+            
             window.addEventListener('online', updateNetworkStatus);
             window.addEventListener('offline', updateNetworkStatus);
             updateNetworkStatus();
             
+            // 优化认证状态监听
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     currentUser = user;
@@ -877,7 +1170,11 @@
                     appContent.style.display = 'block';
                     
                     try {
-                        await loadRecordsFromFirebase();
+                        // 并行加载数据
+                        await Promise.all([
+                            loadRecordsFromFirebase(),
+                            new Promise(resolve => setTimeout(resolve, 100)) // 添加小延迟确保UI更新
+                        ]);
                         updateUI();
                     } catch (error) {
                         console.error("加载数据失败:", error);
@@ -891,16 +1188,6 @@
                     records = [];
                 }
                 showLoader(false);
-            });
-            
-            datePickerButton.addEventListener('click', () => {
-                datePicker.click();
-            });
-            
-            datePicker.addEventListener('change', (e) => {
-                selectedDate = e.target.value;
-                dateDisplay.textContent = formatDate(selectedDate);
-                updateUI();
             });
             
             addButton.addEventListener('click', () => {
@@ -961,6 +1248,28 @@
                     resetEmail.value = '';
                 }
             });
+
+            detailsButton.addEventListener('click', () => {
+                detailsModal.style.display = 'flex';
+                initCharts();
+                updateDetailsCharts();
+            });
+
+            detailsCloseBtn.addEventListener('click', () => {
+                detailsModal.style.display = 'none';
+            });
+
+            detailsModal.addEventListener('click', (e) => {
+                if (e.target === detailsModal) {
+                    detailsModal.style.display = 'none';
+                }
+            });
+
+            startDateInput.addEventListener('change', updateDetailsCharts);
+            endDateInput.addEventListener('change', updateDetailsCharts);
+
+            detailsExportCsvBtn.addEventListener('click', exportDetailsToCsv);
+            detailsExportExcelBtn.addEventListener('click', exportDetailsToExcel);
 
             amountInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -1028,13 +1337,25 @@
             authError.textContent = "";
             
             try {
-                await auth.signInWithEmailAndPassword(email, password);
+                // 设置登录超时
+                const loginPromise = auth.signInWithEmailAndPassword(email, password);
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('登录超时')), 5000)
+                );
+                
+                await Promise.race([loginPromise, timeoutPromise]);
+                
+                // 登录成功后保存信息
+                localStorage.setItem('userEmail', email);
+                localStorage.setItem('userPassword', password);
             } catch (loginError) {
                 console.error("登录错误:", loginError);
                 
                 if (loginError.code === 'auth/user-not-found') {
                     try {
                         await auth.createUserWithEmailAndPassword(email, password);
+                        localStorage.setItem('userEmail', email);
+                        localStorage.setItem('userPassword', password);
                         authError.textContent = "注册成功，已自动登录";
                     } catch (signupError) {
                         console.error("注册错误:", signupError);
@@ -1108,7 +1429,7 @@
             });
         }
 
-        // 更新UI
+        // 更新主界面UI
         function updateUI() {
             const filteredRecords = records.filter(record => record.date === selectedDate);
             
@@ -1195,6 +1516,7 @@
                 selectedType = null;
                 addModal.style.display = 'none';
                 updateUI();
+                updateDetailsCharts();
             } catch (error) {
                 console.error("保存失败:", error);
                 alert('保存失败，请检查网络连接');
@@ -1225,6 +1547,7 @@
                 records = records.filter(record => record.id !== id);
                 
                 updateUI();
+                updateDetailsCharts();
             } catch (error) {
                 console.error("删除失败:", error);
                 alert('删除失败，请检查网络连接');
@@ -1233,19 +1556,182 @@
             }
         }
 
-        // 导出为CSV
-        function exportToCsv() {
-            if (records.length === 0) {
-                alert('没有可导出的记录');
-                return;
+        // 初始化图表
+        function initCharts() {
+            if (profitChart) profitChart.destroy();
+            if (incomeChart) incomeChart.destroy();
+            if (expenseChart) expenseChart.destroy();
+
+            const chartConfig = {
+                type: 'line',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            };
+
+            profitChart = new Chart(document.getElementById('profitChart'), {
+                ...chartConfig,
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        borderColor: '#007AFF',
+                        backgroundColor: 'rgba(0,122,255,0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                }
+            });
+
+            incomeChart = new Chart(document.getElementById('incomeChart'), {
+                ...chartConfig,
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        borderColor: '#34C759',
+                        backgroundColor: 'rgba(52,199,89,0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                }
+            });
+
+            expenseChart = new Chart(document.getElementById('expenseChart'), {
+                ...chartConfig,
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        borderColor: '#FF3B30',
+                        backgroundColor: 'rgba(255,59,48,0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                }
+            });
+        }
+
+        // 更新详细数据图表
+        function updateDetailsCharts() {
+            const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+            const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+
+            // 确保图表已初始化
+            if (!profitChart || !incomeChart || !expenseChart) {
+                initCharts();
             }
+
+            let filteredRecords = records;
+            if (startDate || endDate) {
+                filteredRecords = records.filter(record => {
+                    const recordDate = new Date(record.date);
+                    return (!startDate || recordDate >= startDate) && (!endDate || recordDate <= endDate);
+                });
+            }
+
+            // 获取最近7天的数据
+            const last7Days = Array.from({length: 7}, (_, i) => {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                return date.toISOString().split('T')[0];
+            }).reverse();
+
+            const dailyData = {};
+            last7Days.forEach(date => {
+                dailyData[date] = {
+                    income: 0,
+                    expense: 0,
+                    profit: 0
+                };
+            });
+
+            // 处理记录并填充数据
+            filteredRecords.forEach(record => {
+                // 确保日期存在于数据结构中
+                if (!dailyData[record.date] && last7Days.includes(record.date)) {
+                    dailyData[record.date] = { income: 0, expense: 0, profit: 0 };
+                }
+                
+                if (dailyData[record.date]) {
+                    if (record.type.startsWith('收入')) {
+                        dailyData[record.date].income += record.amount;
+                        dailyData[record.date].profit += record.amount;
+                    } else {
+                        dailyData[record.date].expense += record.amount;
+                        dailyData[record.date].profit -= record.amount;
+                    }
+                }
+            });
+
+            // 更新图表数据
+            profitChart.data.labels = last7Days.map(date => formatDate(date));
+            profitChart.data.datasets[0].data = last7Days.map(date => dailyData[date].profit);
+
+            incomeChart.data.labels = last7Days.map(date => formatDate(date));
+            incomeChart.data.datasets[0].data = last7Days.map(date => dailyData[date].income);
+
+            expenseChart.data.labels = last7Days.map(date => formatDate(date));
+            expenseChart.data.datasets[0].data = last7Days.map(date => dailyData[date].expense);
+
+            // 计算并更新总数据 - 使用所有过滤后的记录，不只是近7天
+            const totals = filteredRecords.reduce((acc, record) => {
+                if (record.type.startsWith('收入')) {
+                    acc.income += record.amount;
+                    acc.profit += record.amount;
+                } else if (record.type.startsWith('费用')) {
+                    acc.expense += record.amount;
+                    acc.profit -= record.amount;
+                }
+                return acc;
+            }, { income: 0, expense: 0, profit: 0 });
+
+            // 更新DOM上的总计数据
+            document.getElementById('totalIncome').textContent = totals.income.toFixed(2);
+            document.getElementById('totalExpense').textContent = totals.expense.toFixed(2);
+            document.getElementById('totalProfit').textContent = totals.profit.toFixed(2);
+
+            // 更新图表
+            profitChart.update();
+            incomeChart.update();
+            expenseChart.update();
             
+            console.log("图表已更新", {
+                labels: last7Days.map(date => formatDate(date)),
+                profitData: last7Days.map(date => dailyData[date].profit),
+                incomeData: last7Days.map(date => dailyData[date].income),
+                expenseData: last7Days.map(date => dailyData[date].expense),
+                totals
+            });
+        }
+
+        // 主界面导出为CSV
+        function exportToCsv() {
             const recordsToExport = selectedDate ? 
                 records.filter(record => record.date === selectedDate) : 
                 records;
             
             if (recordsToExport.length === 0) {
-                alert('选定日期没有记录');
+                alert('没有可导出的记录');
                 return;
             }
             
@@ -1254,50 +1740,133 @@
                 csv += `${record.date},${record.type},${record.amount.toFixed(2)}\n`;
             });
             
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            const dateSuffix = selectedDate ? `_${selectedDate}` : '';
-            link.download = `记账数据${dateSuffix}_${new Date().toLocaleDateString()}.csv`;
-            link.click();
+            exportFile(csv, 'csv', `记账数据${selectedDate ? `_${selectedDate}` : ''}_${new Date().toLocaleDateString()}`);
         }
 
-        // 导出为Excel
+        // 主界面导出为Excel
         function exportToExcel() {
-            if (records.length === 0) {
-                alert('没有可导出的记录');
-                return;
-            }
-            
             const recordsToExport = selectedDate ? 
                 records.filter(record => record.date === selectedDate) : 
                 records;
             
             if (recordsToExport.length === 0) {
-                alert('选定日期没有记录');
+                alert('没有可导出的记录');
                 return;
             }
             
             const data = [
                 ['日期', '类型', '金额'],
-                ...recordsToExport.map(record => [
-                    record.date,
-                    record.type,
-                    record.amount.toFixed(2)
-                ])
+                ...recordsToExport.map(record => [record.date, record.type, record.amount.toFixed(2)])
             ];
             
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(data);
             XLSX.utils.book_append_sheet(wb, ws, "记账数据");
+            XLSX.writeFile(wb, `记账数据${selectedDate ? `_${selectedDate}` : ''}_${new Date().toLocaleDateString()}.xlsx`);
+        }
+
+        // 详细数据导出为CSV
+        function exportDetailsToCsv() {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+            const recordsToExport = getFilteredRecords(startDate, endDate);
             
-            const dateSuffix = selectedDate ? `_${selectedDate}` : '';
-            XLSX.writeFile(wb, `记账数据${dateSuffix}_${new Date().toLocaleDateString()}.xlsx`);
+            if (recordsToExport.length === 0) {
+                alert('指定范围内没有记录');
+                return;
+            }
+            
+            let csv = '日期,类型,金额\n';
+            recordsToExport.forEach(record => {
+                csv += `${record.date},${record.type},${record.amount.toFixed(2)}\n`;
+            });
+            
+            exportFile(csv, 'csv', `详细记账数据_${startDate || '开始'}_至_${endDate || '现在'}_${new Date().toLocaleDateString()}`);
+        }
+
+        // 详细数据导出为Excel
+        function exportDetailsToExcel() {
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+            const recordsToExport = getFilteredRecords(startDate, endDate);
+            
+            if (recordsToExport.length === 0) {
+                alert('指定范围内没有记录');
+                return;
+            }
+            
+            const data = [
+                ['日期', '类型', '金额'],
+                ...recordsToExport.map(record => [record.date, record.type, record.amount.toFixed(2)])
+            ];
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, "详细记账数据");
+            XLSX.writeFile(wb, `详细记账数据_${startDate || '开始'}_至_${endDate || '现在'}_${new Date().toLocaleDateString()}.xlsx`);
+        }
+
+        // 获取过滤后的记录
+        function getFilteredRecords(startDate, endDate) {
+            let filteredRecords = records;
+            if (startDate || endDate) {
+                filteredRecords = records.filter(record => {
+                    const recordDate = new Date(record.date);
+                    return (!startDate || recordDate >= new Date(startDate)) && (!endDate || recordDate <= new Date(endDate));
+                });
+            }
+            return filteredRecords;
+        }
+
+        // 导出文件通用函数
+        function exportFile(content, type, filename) {
+            const blob = new Blob([content], { type: `text/${type};charset=utf-8;` });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${filename}.${type}`;
+            link.click();
+            URL.revokeObjectURL(url);
         }
 
         // 全局函数
         window.deleteRecord = deleteRecord;
+
+        // 添加自动登录功能
+        async function checkAutoLogin() {
+            const savedEmail = localStorage.getItem('userEmail');
+            const savedPassword = localStorage.getItem('userPassword');
+            
+            if (savedEmail && savedPassword) {
+                emailInput.value = savedEmail;
+                passwordInput.value = savedPassword;
+                
+                try {
+                    // 使用 Promise.race 设置超时
+                    await Promise.race([
+                        auth.signInWithEmailAndPassword(savedEmail, savedPassword),
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('登录超时')), 5000)
+                        )
+                    ]);
+                } catch (error) {
+                    console.error("自动登录失败:", error);
+                    // 清除可能过期的登录信息
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userPassword');
+                }
+            }
+        }
+
+        // 新增日期导航功能
+        function navigateDate(days) {
+            const currentDate = new Date(selectedDate);
+            currentDate.setDate(currentDate.getDate() + days);
+            selectedDate = currentDate.toISOString().split('T')[0];
+            datePicker.value = selectedDate;
+            dateDisplay.textContent = formatDate(selectedDate);
+            updateUI();
+        }
 
         // 启动应用
         document.addEventListener('DOMContentLoaded', init);
