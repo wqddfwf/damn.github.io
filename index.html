@@ -700,43 +700,38 @@
       }
       
       .date-range-selector {
-          background-color: rgba(255, 255, 255, 0.9);
-          border-radius: 16px;
-          margin: 16px 0;
-          padding: 20px;
-          box-shadow: 0 1px 8px rgba(0,0,0,0.06);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(0,0,0,0.05);
+          margin: 20px 16px;
+          padding: 0;
+          background: transparent;
+          border: none;
+          box-shadow: none;
       }
       
       .date-range-title {
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 600;
-          color: var(--black);
-          margin-bottom: 16px;
-          letter-spacing: -0.3px;
+          color: var(--system-gray-5);
+          margin-bottom: 12px;
+          letter-spacing: -0.2px;
       }
       
       .date-range-buttons {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-bottom: 20px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          margin-bottom: 22px;
       }
       
       .range-preset-button {
-          flex: 1;
-          min-width: calc(33.333% - 8px);
-          padding: 10px 0;
-          background-color: rgba(242, 242, 247, 0.9);
-          border: 1px solid rgba(0,0,0,0.05);
+          padding: 12px 0;
+          background-color: transparent;
+          border: 1px solid var(--system-gray-3);
           border-radius: 10px;
           font-size: 14px;
           font-weight: 500;
           color: var(--black);
           cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+          transition: all 0.2s;
           text-align: center;
       }
       
@@ -744,52 +739,50 @@
       .range-preset-button.active {
           background-color: var(--primary-blue);
           color: var(--white);
-          transform: scale(0.98);
+          transform: none;
           border-color: var(--primary-blue);
       }
       
       .custom-range-inputs {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 20px;
+          margin-bottom: 22px;
+          position: relative;
       }
       
       .date-input-wrapper {
+          background-color: var(--white);
+          border: 1px solid var(--system-gray-3);
+          border-radius: 12px;
+          padding: 10px 12px 8px;
+          margin-bottom: 10px;
           position: relative;
-          flex: 1;
+      }
+      
+      .date-input-label {
+          position: static;
+          display: block;
+          font-size: 12px;
+          color: var(--system-gray-4);
+          margin-bottom: 4px;
+          background: transparent;
+          padding: 0;
       }
       
       .date-range-input {
           width: 100%;
-          padding: 12px 16px;
-          border: 1px solid rgba(0,0,0,0.05);
-          border-radius: 12px;
+          padding: 0;
+          border: none;
           font-size: 15px;
-          background-color: rgba(242, 242, 247, 0.8);
-          transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+          font-weight: 450;
+          background-color: transparent;
+          color: var(--black);
           -webkit-appearance: none;
           appearance: none;
-          color: var(--black);
       }
       
       .date-range-input:focus {
           outline: none;
-          border-color: var(--primary-blue);
-          background-color: rgba(240, 240, 245, 0.9);
-          box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
-      }
-      
-      .date-input-label {
-          position: absolute;
-          top: -8px;
-          left: 12px;
-          font-size: 12px;
-          font-weight: 500;
-          color: var(--system-gray-4);
-          background-color: rgba(255, 255, 255, 0.9);
-          padding: 0 5px;
-          border-radius: 4px;
-          z-index: 1;
+          box-shadow: none;
+          border: none;
       }
       
       .apply-dates-button {
@@ -797,22 +790,21 @@
           background-color: var(--primary-blue);
           color: var(--white);
           padding: 14px;
-          border-radius: 14px;
+          border-radius: 12px;
           font-size: 16px;
           font-weight: 500;
           cursor: pointer;
           border: none;
-          transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+          transition: opacity 0.2s;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 2px 8px rgba(0,122,255,0.25);
+          box-shadow: none;
       }
       
       .apply-dates-button:active {
-          transform: scale(0.97);
-          background-color: #0066CC;
-          box-shadow: 0 1px 4px rgba(0,122,255,0.15);
+          opacity: 0.9;
+          transform: none;
       }
       
       /* 优化图表容器 */
@@ -1255,6 +1247,208 @@
               opacity: 1;
           }
       }
+
+      /* 增加响应式设计和优化 */
+      @media (max-width: 375px) {
+          .date-range-title {
+              font-size: 14px;
+              margin-bottom: 10px;
+          }
+          
+          .range-preset-button {
+              font-size: 13px;
+              padding: 10px 0;
+          }
+          
+          .date-range-buttons {
+              gap: 8px;
+              margin-bottom: 18px;
+          }
+          
+          .date-input-wrapper {
+              padding: 8px 10px 6px;
+          }
+          
+          .date-input-label {
+              font-size: 11px;
+          }
+          
+          .date-range-input {
+              font-size: 14px;
+          }
+          
+          .apply-dates-button {
+              padding: 12px;
+              font-size: 15px;
+          }
+          
+          .stat-value {
+              font-size: 20px;
+          }
+          
+          .stat-label {
+              font-size: 12px;
+          }
+          
+          .chart-title {
+              font-size: 14px;
+          }
+          
+          .chart-wrapper {
+              height: 220px;
+          }
+          
+          .modal-header {
+              padding: 12px 16px;
+          }
+      }
+
+      /* 增加横屏模式优化 */
+      @media (orientation: landscape) and (max-height: 500px) {
+          .details-modal-content {
+              max-height: 95vh;
+              display: flex;
+              flex-direction: column;
+          }
+          
+          .modal-body {
+              overflow-y: auto;
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              grid-gap: 10px;
+          }
+          
+          .summary-stats {
+              grid-column: 1 / 3;
+          }
+          
+          .date-range-selector {
+              grid-column: 1 / 3;
+          }
+          
+          .chart-container {
+              margin: 0 0 15px;
+          }
+          
+          .chart-wrapper {
+              height: 200px;
+          }
+      }
+
+      /* 触控优化 */
+      .range-preset-button, .apply-dates-button, .date-input-wrapper {
+          min-height: 44px; /* 最小触控区域高度 */
+      }
+
+      input, button {
+          touch-action: manipulation; /* 防止延迟点击 */
+      }
+
+      @media (pointer: coarse) {
+          /* 针对触摸设备的样式 */
+          .range-preset-button, .apply-dates-button {
+              padding: 12px 0;
+          }
+          
+          .type-option {
+              padding: 14px;
+          }
+      }
+
+      /* 新增记录列表和分页样式 */
+      .records-list-container {
+          margin: 0 16px 24px;
+          background-color: rgba(250, 250, 250, 0.8);
+          border-radius: 16px;
+          padding: 16px;
+          box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+          backdrop-filter: blur(5px);
+          -webkit-backdrop-filter: blur(5px);
+      }
+
+      .records-list-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--system-gray-5);
+          margin-bottom: 16px;
+          text-align: center;
+      }
+
+      .details-records-list {
+          margin-bottom: 16px;
+      }
+
+      .date-header {
+          padding: 8px 0;
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--system-gray-5);
+          border-bottom: 1px solid var(--system-gray-2);
+          margin-bottom: 8px;
+      }
+
+      .detail-record-item {
+          display: flex;
+          justify-content: space-between;
+          padding: 10px;
+          border-bottom: 1px solid var(--system-gray-2);
+          font-size: 15px;
+      }
+
+      .detail-record-item:last-child {
+          border-bottom: none;
+      }
+
+      .record-type {
+          font-weight: 500;
+      }
+
+      .record-amount {
+          font-weight: 600;
+      }
+
+      .record-type.income, .record-amount.income {
+          color: var(--primary-green);
+      }
+
+      .record-type.expense, .record-amount.expense {
+          color: var(--primary-red);
+      }
+
+      .pagination-controls {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 0;
+      }
+
+      .pagination-button {
+          background-color: var(--white);
+          border: 1px solid var(--system-gray-3);
+          border-radius: 8px;
+          padding: 8px 12px;
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--primary-blue);
+          cursor: pointer;
+      }
+
+      .pagination-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+      }
+
+      .pagination-info {
+          font-size: 14px;
+          color: var(--system-gray-5);
+      }
+
+      .no-records {
+          text-align: center;
+          color: var(--system-gray-4);
+          padding: 20px;
+          font-size: 15px;
+      }
   </style>
 </head>
 <body>
@@ -1482,6 +1676,20 @@
                                 <canvas id="expenseChart"></canvas>
                             </div>
                         </div>
+                        
+                        <div class="records-list-container">
+                            <div class="records-list-title">详细记录</div>
+                            <div id="detailsRecordsList" class="details-records-list">
+                                <!-- 记录将通过JavaScript动态加载 -->
+                            </div>
+                            <div id="paginationControls" class="pagination-controls">
+                                <button id="prevPage" class="pagination-button" onclick="goToPrevPage()">上一页</button>
+                                <div class="pagination-info">
+                                    <span id="currentPage">1</span> / <span id="totalPages">1</span>
+                                </div>
+                                <button id="nextPage" class="pagination-button" onclick="goToNextPage()">下一页</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1579,6 +1787,355 @@
         let isOnline = navigator.onLine;
         let selectedType = null;
         let profitChart, incomeChart, expenseChart;
+
+        // 数据缓存系统
+        const dataCache = {
+            records: {},         // 按日期缓存记录
+            statistics: {},      // 按日期范围缓存统计数据
+            lastUpdated: {},     // 跟踪缓存上次更新时间
+            
+            // 获取缓存记录
+            getRecords(date) {
+                return this.records[date] || null;
+            },
+            
+            // 存储记录到缓存
+            setRecords(date, data) {
+                this.records[date] = data;
+                this.lastUpdated[`record_${date}`] = Date.now();
+                
+                // 将缓存保存到localStorage
+                try {
+                    localStorage.setItem('jizhang_records_cache', JSON.stringify(this.records));
+                    localStorage.setItem('jizhang_cache_timestamps', JSON.stringify(this.lastUpdated));
+                } catch (e) {
+                    console.warn('缓存存储失败:', e);
+                }
+            },
+            
+            // 获取缓存统计数据
+            getStats(rangeKey) {
+                return this.statistics[rangeKey] || null;
+            },
+            
+            // 存储统计数据到缓存
+            setStats(rangeKey, data) {
+                this.statistics[rangeKey] = data;
+                this.lastUpdated[`stats_${rangeKey}`] = Date.now();
+                
+                // 将缓存保存到localStorage
+                try {
+                    localStorage.setItem('jizhang_stats_cache', JSON.stringify(this.statistics));
+                    localStorage.setItem('jizhang_cache_timestamps', JSON.stringify(this.lastUpdated));
+                } catch (e) {
+                    console.warn('缓存存储失败:', e);
+                }
+            },
+            
+            // 判断缓存是否过期 (24小时)
+            isExpired(key) {
+                const timestamp = this.lastUpdated[key];
+                if (!timestamp) return true;
+                
+                const now = Date.now();
+                const ONE_DAY = 24 * 60 * 60 * 1000;
+                return (now - timestamp) > ONE_DAY;
+            },
+            
+            // 加载缓存
+            loadFromStorage() {
+                try {
+                    const recordsCache = localStorage.getItem('jizhang_records_cache');
+                    const statsCache = localStorage.getItem('jizhang_stats_cache');
+                    const timestamps = localStorage.getItem('jizhang_cache_timestamps');
+                    
+                    if (recordsCache) this.records = JSON.parse(recordsCache);
+                    if (statsCache) this.statistics = JSON.parse(statsCache);
+                    if (timestamps) this.lastUpdated = JSON.parse(timestamps);
+                } catch (e) {
+                    console.warn('加载缓存失败:', e);
+                }
+            },
+            
+            // 清除缓存
+            clear() {
+                this.records = {};
+                this.statistics = {};
+                this.lastUpdated = {};
+                
+                try {
+                    localStorage.removeItem('jizhang_records_cache');
+                    localStorage.removeItem('jizhang_stats_cache');
+                    localStorage.removeItem('jizhang_cache_timestamps');
+                } catch (e) {
+                    console.warn('清除缓存失败:', e);
+                }
+            }
+        };
+        
+        // 初始化时加载缓存
+        dataCache.loadFromStorage();
+        
+        // 数据加载和图表更新函数
+        function loadRecordsForDateRange(startDate, endDate, callback) {
+            if (!currentUser) return;
+            
+            const rangeKey = `${startDate}_${endDate}`;
+            const cachedStats = dataCache.getStats(rangeKey);
+            
+            if (cachedStats && !dataCache.isExpired(`stats_${rangeKey}`)) {
+                // 使用缓存数据更新图表
+                updateChartsWithData(cachedStats);
+                if (callback) callback(cachedStats);
+                return;
+            }
+            
+            // 使用Firebase查询限制记录数量
+            showLoader('正在加载数据...');
+            const recordsRef = database.ref(`users/${currentUser.uid}/records`);
+            
+            recordsRef.orderByChild('date')
+                .startAt(startDate)
+                .endAt(endDate)
+                .limitToLast(500) // 限制加载记录数量
+                .once('value')
+                .then(snapshot => {
+                    hideLoader();
+                    const data = snapshot.val() || {};
+                    
+                    // 预处理和聚合数据
+                    const processedData = processDataForCharts(data, startDate, endDate);
+                    
+                    // 缓存处理后的数据
+                    dataCache.setStats(rangeKey, processedData);
+                    
+                    // 更新图表
+                    updateChartsWithData(processedData);
+                    
+                    if (callback) callback(processedData);
+                })
+                .catch(error => {
+                    hideLoader();
+                    console.error('加载数据失败:', error);
+                    alert('加载数据失败，请检查网络连接。');
+                });
+        }
+        
+        // 数据预处理和聚合
+        function processDataForCharts(data, startDate, endDate) {
+            const records = Object.values(data || {});
+            
+            // 按日期分组汇总数据
+            const dailyData = {};
+            let totalIncome = 0;
+            let totalExpense = 0;
+            
+            // 创建日期范围内的所有日期
+            let currentDate = new Date(startDate);
+            const endDateObj = new Date(endDate);
+            while (currentDate <= endDateObj) {
+                const dateString = currentDate.toISOString().split('T')[0];
+                dailyData[dateString] = { income: 0, expense: 0, profit: 0 };
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            // 汇总数据
+            records.forEach(record => {
+                const date = record.date;
+                const amount = parseFloat(record.amount);
+                
+                if (!dailyData[date]) {
+                    dailyData[date] = { income: 0, expense: 0, profit: 0 };
+                }
+                
+                if (record.type.startsWith('收入')) {
+                    dailyData[date].income += amount;
+                    totalIncome += amount;
+                } else if (record.type.startsWith('费用')) {
+                    dailyData[date].expense += amount;
+                    totalExpense += amount;
+                }
+                
+                dailyData[date].profit = dailyData[date].income - dailyData[date].expense;
+            });
+            
+            // 转换为图表数据格式
+            const dates = Object.keys(dailyData).sort();
+            const incomeData = dates.map(date => dailyData[date].income);
+            const expenseData = dates.map(date => dailyData[date].expense);
+            const profitData = dates.map(date => dailyData[date].profit);
+            
+            const totalProfit = totalIncome - totalExpense;
+            
+            return {
+                dates,
+                incomeData,
+                expenseData,
+                profitData,
+                totalIncome,
+                totalExpense,
+                totalProfit,
+                rawRecords: records
+            };
+        }
+        
+        // 增量更新图表而不是重建
+        function updateChartsWithData(data) {
+            // 更新统计数据显示
+            document.getElementById('totalIncome').textContent = data.totalIncome.toFixed(2);
+            document.getElementById('totalExpense').textContent = data.totalExpense.toFixed(2);
+            document.getElementById('totalProfit').textContent = data.totalProfit.toFixed(2);
+            
+            // 格式化日期标签为更友好的格式
+            const formattedDates = data.dates.map(date => {
+                const d = new Date(date);
+                return `${d.getMonth() + 1}/${d.getDate()}`;
+            });
+            
+            // 更新利润图表
+            if (profitChart) {
+                profitChart.data.labels = formattedDates;
+                profitChart.data.datasets[0].data = data.profitData;
+                profitChart.update();
+            } else {
+                initProfitChart(formattedDates, data.profitData);
+            }
+            
+            // 更新收入图表
+            if (incomeChart) {
+                incomeChart.data.labels = formattedDates;
+                incomeChart.data.datasets[0].data = data.incomeData;
+                incomeChart.update();
+            } else {
+                initIncomeChart(formattedDates, data.incomeData);
+            }
+            
+            // 更新费用图表
+            if (expenseChart) {
+                expenseChart.data.labels = formattedDates;
+                expenseChart.data.datasets[0].data = data.expenseData;
+                expenseChart.update();
+            } else {
+                initExpenseChart(formattedDates, data.expenseData);
+            }
+        }
+        
+        // 分页加载记录
+        let currentPage = 1;
+        const PAGE_SIZE = 20;
+        let allFilteredRecords = [];
+        
+        function loadRecordsWithPagination(startDate, endDate) {
+            if (!currentUser) return;
+            
+            showLoader('加载记录中...');
+            const recordsRef = database.ref(`users/${currentUser.uid}/records`);
+            
+            recordsRef.orderByChild('date')
+                .startAt(startDate)
+                .endAt(endDate)
+                .once('value')
+                .then(snapshot => {
+                    hideLoader();
+                    const data = snapshot.val() || {};
+                    
+                    // 转换为数组并按日期排序
+                    allFilteredRecords = Object.values(data).sort((a, b) => {
+                        // 先按日期降序
+                        if (a.date !== b.date) {
+                            return new Date(b.date) - new Date(a.date);
+                        }
+                        // 同一天，按类型排序
+                        return a.type.localeCompare(b.type);
+                    });
+                    
+                    // 重置为第一页并显示
+                    currentPage = 1;
+                    displayCurrentPage();
+                    
+                    // 显示或隐藏页码控制器
+                    const paginationControls = document.getElementById('paginationControls');
+                    if (paginationControls) {
+                        paginationControls.style.display = allFilteredRecords.length > PAGE_SIZE ? 'flex' : 'none';
+                    }
+                })
+                .catch(error => {
+                    hideLoader();
+                    console.error('加载记录失败:', error);
+                    alert('加载记录失败，请检查网络连接。');
+                });
+        }
+        
+        function displayCurrentPage() {
+            const recordsContainer = document.getElementById('detailsRecordsList');
+            if (!recordsContainer) return;
+            
+            // 计算当前页的记录
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const end = start + PAGE_SIZE;
+            const pageRecords = allFilteredRecords.slice(start, end);
+            
+            // 清空容器
+            recordsContainer.innerHTML = '';
+            
+            if (pageRecords.length === 0) {
+                recordsContainer.innerHTML = '<div class="no-records">该时间段内没有记录</div>';
+                return;
+            }
+            
+            // 添加记录
+            let currentDate = '';
+            pageRecords.forEach(record => {
+                // 如果是新的日期，添加日期分隔符
+                if (record.date !== currentDate) {
+                    currentDate = record.date;
+                    const dateHeader = document.createElement('div');
+                    dateHeader.className = 'date-header';
+                    
+                    // 格式化日期为更友好的格式
+                    const recordDate = new Date(record.date);
+                    const formattedDate = `${recordDate.getFullYear()}年${recordDate.getMonth() + 1}月${recordDate.getDate()}日`;
+                    
+                    dateHeader.textContent = formattedDate;
+                    recordsContainer.appendChild(dateHeader);
+                }
+                
+                // 创建记录项
+                const recordItem = document.createElement('div');
+                recordItem.className = 'detail-record-item';
+                
+                const typeClass = record.type.startsWith('收入') ? 'income' : 'expense';
+                
+                recordItem.innerHTML = `
+                    <div class="record-type ${typeClass}">${record.type}</div>
+                    <div class="record-amount ${typeClass}">${parseFloat(record.amount).toFixed(2)}</div>
+                `;
+                
+                recordsContainer.appendChild(recordItem);
+            });
+            
+            // 更新页码显示
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = Math.ceil(allFilteredRecords.length / PAGE_SIZE);
+            
+            // 启用/禁用页码按钮
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage >= Math.ceil(allFilteredRecords.length / PAGE_SIZE);
+        }
+        
+        function goToNextPage() {
+            if (currentPage < Math.ceil(allFilteredRecords.length / PAGE_SIZE)) {
+                currentPage++;
+                displayCurrentPage();
+            }
+        }
+        
+        function goToPrevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayCurrentPage();
+            }
+        }
 
         // DOM元素
         const datePicker = document.getElementById('datePicker');
@@ -2872,6 +3429,329 @@
             
             // 自动聚焦
             setTimeout(() => dateInput.focus(), 300);
+        }
+
+        // 初始化详细数据中的日期范围预设按钮
+        function initDateRangeButtons() {
+            const rangeButtons = document.querySelectorAll('.range-preset-button');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const applyButton = document.getElementById('applyDatesBtn');
+            
+            // 设置今天为默认结束日期
+            const today = new Date();
+            endDateInput.value = today.toISOString().split('T')[0];
+            
+            // 设置30天前为默认开始日期
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            startDateInput.value = thirtyDaysAgo.toISOString().split('T')[0];
+            
+            // 默认选中"最近30天"按钮
+            document.querySelector('.range-preset-button[data-days="30"]').classList.add('active');
+            
+            // 初始加载数据
+            loadRecordsForDateRange(startDateInput.value, endDateInput.value, data => {
+                // 加载详细记录列表
+                loadRecordsWithPagination(startDateInput.value, endDateInput.value);
+            });
+            
+            rangeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 移除所有按钮的激活状态
+                    rangeButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // 将当前按钮设为激活状态
+                    button.classList.add('active');
+                    
+                    const today = new Date();
+                    let startDate = new Date();
+                    
+                    // 根据按钮设置日期范围
+                    if (button.dataset.days) {
+                        // 天数范围
+                        const days = parseInt(button.dataset.days);
+                        startDate.setDate(today.getDate() - days + 1);
+                    } else if (button.dataset.range === 'month') {
+                        // 本月
+                        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    } else if (button.dataset.range === 'last-month') {
+                        // 上月
+                        startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                        today.setDate(0); // 上月最后一天
+                    } else if (button.dataset.range === 'year') {
+                        // 今年
+                        startDate = new Date(today.getFullYear(), 0, 1);
+                    }
+                    
+                    // 更新输入框
+                    startDateInput.value = startDate.toISOString().split('T')[0];
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    
+                    // 加载数据
+                    loadRecordsForDateRange(startDateInput.value, endDateInput.value, data => {
+                        // 加载详细记录列表
+                        loadRecordsWithPagination(startDateInput.value, endDateInput.value);
+                    });
+                });
+            });
+            
+            // 应用按钮点击事件
+            applyButton.addEventListener('click', () => {
+                // 移除所有按钮的激活状态
+                rangeButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // 确保日期有效
+                if (!startDateInput.value || !endDateInput.value) {
+                    alert('请选择有效的开始和结束日期');
+                    return;
+                }
+                
+                // 加载数据
+                loadRecordsForDateRange(startDateInput.value, endDateInput.value, data => {
+                    // 加载详细记录列表
+                    loadRecordsWithPagination(startDateInput.value, endDateInput.value);
+                });
+            });
+        }
+
+        // 初始化利润图表
+        function initProfitChart(labels, data) {
+            const ctx = document.getElementById('profitChart').getContext('2d');
+            
+            // 创建渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(0, 122, 255, 0.2)');
+            gradient.addColorStop(1, 'rgba(0, 122, 255, 0.0)');
+            
+            profitChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '利润',
+                        data: data,
+                        borderColor: '#007AFF',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#007AFF',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 1,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#000',
+                            bodyColor: '#000',
+                            borderColor: 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `利润: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: 'rgba(0, 0, 0, 0.6)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(0, 0, 0, 0.6)',
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 初始化收入图表
+        function initIncomeChart(labels, data) {
+            const ctx = document.getElementById('incomeChart').getContext('2d');
+            
+            // 创建渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(52, 199, 89, 0.2)');
+            gradient.addColorStop(1, 'rgba(52, 199, 89, 0.0)');
+            
+            incomeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '收入',
+                        data: data,
+                        borderColor: '#34C759',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#34C759',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 1,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#000',
+                            bodyColor: '#000',
+                            borderColor: 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `收入: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'rgba(0, 0, 0, 0.6)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(0, 0, 0, 0.6)',
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 初始化费用图表
+        function initExpenseChart(labels, data) {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            
+            // 创建渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(255, 59, 48, 0.2)');
+            gradient.addColorStop(1, 'rgba(255, 59, 48, 0.0)');
+            
+            expenseChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '费用',
+                        data: data,
+                        borderColor: '#FF3B30',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#FF3B30',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 1,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#000',
+                            bodyColor: '#000',
+                            borderColor: 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `费用: ${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'rgba(0, 0, 0, 0.6)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(0, 0, 0, 0.6)',
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
         }
     </script>
 </body>
