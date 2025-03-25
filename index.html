@@ -217,15 +217,42 @@
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 16px;
+          padding: 16px 20px; /* 增加水平内边距 */
           border-bottom: 1px solid rgba(0,0,0,0.03);
           position: relative;
+          gap: 8px; /* 添加间距 */
+          cursor: pointer; /* 表明可点击 */
+          transition: background-color 0.2s;
+      }
+      
+      .date-display:active {
+          background-color: var(--system-gray-1);
       }
       
       .date-display-text {
-          font-size: 20px;
+          font-size: 22px; /* 增大字体 */
           font-weight: 600;
           color: var(--black);
+          display: flex;
+          align-items: center;
+      }
+      
+      .date-display-text:after {
+          content: '';
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          border-right: 2px solid var(--system-gray-4);
+          border-bottom: 2px solid var(--system-gray-4);
+          transform: rotate(45deg);
+          margin-left: 8px;
+          margin-top: -4px;
+          transition: transform 0.2s;
+      }
+      
+      .date-select-animation .date-display-text:after {
+          transform: rotate(-135deg);
+          margin-top: 4px;
       }
       
       .date-selector-controls {
@@ -619,14 +646,15 @@
       /* 详细数据模态框改进 */
       .details-modal-content {
           max-width: 600px;
-          width: calc(100% - 40px);
-          max-height: 85vh;
+          width: calc(100% - 32px);
+          max-height: 90vh; /* 略微增加高度 */
           overflow-y: auto;
           border-radius: 20px;
-          background-color: rgba(255, 255, 255, 0.96);
+          background-color: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+          -webkit-overflow-scrolling: touch; /* iOS流畅滚动 */
       }
       
       .summary-stats {
@@ -695,28 +723,29 @@
       .date-range-buttons {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
-          margin-bottom: 16px;
+          gap: 12px;
+          margin-bottom: 20px;
       }
       
       .range-preset-button {
-          padding: 10px 8px;
+          padding: 12px 8px; /* 增加高度 */
           background-color: rgba(240, 240, 245, 0.8);
           border: none;
           border-radius: 12px;
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 500;
           color: var(--primary-blue);
           cursor: pointer;
           transition: all 0.2s;
           text-align: center;
+          min-height: 44px; /* 确保最小高度适合手指点击 */
       }
       
       .range-preset-button:active,
       .range-preset-button.active {
           background-color: var(--primary-blue);
           color: var(--white);
-          transform: scale(0.98);
+          transform: scale(0.97);
       }
       
       .custom-range-inputs {
@@ -735,9 +764,12 @@
           padding: 12px 14px;
           border: 1px solid rgba(0,0,0,0.05);
           border-radius: 12px;
-          font-size: 15px;
+          font-size: 16px;
           background-color: rgba(240, 240, 245, 0.6);
           transition: all 0.2s;
+          -webkit-appearance: none; /* 移除iOS默认样式 */
+          appearance: none;
+          height: 44px; /* 固定高度 */
       }
       
       .date-range-input:focus {
@@ -781,6 +813,7 @@
           background-color: #0066CC;
       }
       
+      /* 优化图表容器 */
       .chart-container {
           margin: 0 20px 24px;
           background-color: rgba(250, 250, 250, 0.8);
@@ -800,8 +833,56 @@
       }
       
       .chart-wrapper {
-          height: 200px;
+          height: 280px; /* 增加图表高度，方便手机查看和点击 */
           width: 100%;
+          position: relative; /* 确保图表正确定位 */
+          touch-action: pan-y; /* 优化触摸体验 */
+      }
+      
+      /* 金额输入优化 */
+      .form-group input[type="number"] {
+          width: 100%;
+          padding: 16px;
+          border: 1px solid rgba(0,0,0,0.05);
+          border-radius: 12px;
+          font-size: 18px; /* 增大字体大小 */
+          background-color: rgba(242, 242, 247, 0.6);
+          transition: all 0.2s;
+          -webkit-appearance: none; /* 移除iOS默认样式 */
+          appearance: none;
+          box-shadow: none;
+      }
+      
+      .form-group input[type="number"]:focus {
+          outline: none;
+          border-color: var(--primary-blue);
+          background-color: rgba(242, 242, 247, 0.8);
+          box-shadow: 0 0 0 2px rgba(0,122,255,0.1);
+      }
+      
+      /* 去除数字输入框的上下箭头 */
+      .form-group input[type="number"]::-webkit-inner-spin-button,
+      .form-group input[type="number"]::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+      }
+      
+      /* 添加图表触摸优化样式 */
+      .chart-touch-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1;
+          pointer-events: none;
+      }
+      
+      /* 图表点样式调整，增大交互区域 */
+      @media (max-width: 768px) {
+          .chart-wrapper {
+              height: 240px; /* 手机端稍微减小高度 */
+          }
       }
       
       /* 优化关闭按钮 */
@@ -980,6 +1061,195 @@
           }
           100% {
               background-color: transparent;
+          }
+      }
+      
+      /* 苹果风格日历选择器样式 */
+      .calendar-modal-content {
+          background-color: rgba(250, 250, 250, 0.98);
+          width: calc(100% - 40px);
+          max-width: 340px;
+          border-radius: 20px;
+          overflow: hidden;
+          animation: modal-appear 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+          margin: auto;
+          box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+      }
+      
+      .calendar-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 18px 16px;
+          border-bottom: 1px solid rgba(0,0,0,0.05);
+      }
+      
+      .current-month-year {
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--black);
+      }
+      
+      .calendar-nav-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          color: var(--primary-blue);
+          transition: background-color 0.2s;
+      }
+      
+      .calendar-nav-btn:active {
+          background-color: rgba(0,0,0,0.1);
+      }
+      
+      .weekday-header {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          padding: 12px 16px 0;
+      }
+      
+      .weekday {
+          font-size: 13px;
+          color: var(--system-gray-4);
+          text-align: center;
+          font-weight: 500;
+          padding: 8px 0;
+      }
+      
+      .calendar-days {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          padding: 0 16px 16px;
+          gap: 4px;
+      }
+      
+      .calendar-day {
+          aspect-ratio: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          cursor: pointer;
+          border-radius: 50%;
+          position: relative;
+          color: var(--black);
+      }
+      
+      .calendar-day:active {
+          background-color: rgba(0,0,0,0.1);
+      }
+      
+      .calendar-day.other-month {
+          color: var(--system-gray-3);
+      }
+      
+      .calendar-day.today:after {
+          content: '';
+          position: absolute;
+          bottom: 4px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 4px;
+          height: 4px;
+          background-color: var(--primary-blue);
+          border-radius: 50%;
+      }
+      
+      .calendar-day.selected {
+          background-color: var(--primary-blue);
+          color: white;
+          font-weight: 500;
+          box-shadow: 0 2px 6px rgba(0,122,255,0.3);
+      }
+      
+      .calendar-day.selected:after {
+          display: none;
+      }
+      
+      .calendar-footer {
+          display: flex;
+          justify-content: space-between;
+          padding: 12px 16px;
+          border-top: 1px solid rgba(0,0,0,0.05);
+      }
+      
+      .calendar-today-btn {
+          background-color: transparent;
+          border: none;
+          color: var(--primary-blue);
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+          padding: 8px 16px;
+          border-radius: 12px;
+      }
+      
+      .calendar-today-btn:active {
+          background-color: rgba(0,122,255,0.1);
+      }
+      
+      .calendar-close-btn {
+          background-color: var(--system-gray-1);
+          border: none;
+          color: var(--system-gray-6);
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+          padding: 8px 16px;
+          border-radius: 12px;
+      }
+      
+      .calendar-close-btn:active {
+          background-color: var(--system-gray-2);
+      }
+      
+      /* 日历动画效果 */
+      .slide-left {
+          animation: slideLeft 0.3s forwards;
+      }
+      
+      .slide-right {
+          animation: slideRight 0.3s forwards;
+      }
+      
+      @keyframes slideLeft {
+          from {
+              transform: translateX(20px);
+              opacity: 0;
+          }
+          to {
+              transform: translateX(0);
+              opacity: 1;
+          }
+      }
+      
+      @keyframes slideRight {
+          from {
+              transform: translateX(-20px);
+              opacity: 0;
+          }
+          to {
+              transform: translateX(0);
+              opacity: 1;
+          }
+      }
+      
+      @keyframes modal-appear {
+          from {
+              transform: translateY(20px);
+              opacity: 0;
+          }
+          to {
+              transform: translateY(0);
+              opacity: 1;
           }
       }
   </style>
@@ -1228,6 +1498,41 @@
             </div>
         </div>
     </div>
+    
+    <!-- 苹果风格日历选择器模态框 -->
+    <div class="modal" id="calendarModal">
+        <div class="calendar-modal-content">
+            <div class="calendar-header">
+                <button id="prevMonthBtn" class="calendar-nav-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div id="currentMonthYear" class="current-month-year">2023年4月</div>
+                <button id="nextMonthBtn" class="calendar-nav-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="weekday-header">
+                <div class="weekday">日</div>
+                <div class="weekday">一</div>
+                <div class="weekday">二</div>
+                <div class="weekday">三</div>
+                <div class="weekday">四</div>
+                <div class="weekday">五</div>
+                <div class="weekday">六</div>
+            </div>
+            <div id="calendarDays" class="calendar-days">
+                <!-- 日历日期会通过JavaScript动态生成 -->
+            </div>
+            <div class="calendar-footer">
+                <button id="todayCalendarBtn" class="calendar-today-btn">今天</button>
+                <button id="closeCalendarBtn" class="calendar-close-btn">关闭</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // 数据结构
@@ -1368,22 +1673,8 @@
                 const dateDisplay = document.querySelector('.date-display');
                 dateDisplay.classList.add('date-select-animation');
                 
-                // 触发原生日期选择器
-                datePicker.click();
-                
-                // 监听日期变化来移除选择状态
-                datePicker.addEventListener('change', () => {
-                    dateDisplay.classList.remove('date-select-animation');
-                }, { once: true });
-                
-                // 点击其他地方时移除选择状态
-                setTimeout(() => {
-                    const clickHandler = () => {
-                        dateDisplay.classList.remove('date-select-animation');
-                        document.removeEventListener('click', clickHandler);
-                    };
-                    document.addEventListener('click', clickHandler);
-                }, 100);
+                // 显示苹果风格日历选择器
+                showAppleCalendar();
             });
             
             // 日期导航按钮实现
@@ -1415,6 +1706,32 @@
                 }, 500);
                 
                 updateUI();
+            });
+            
+            // 初始化日历模态框的事件监听
+            document.getElementById('prevMonthBtn').addEventListener('click', () => {
+                navigateCalendarMonth(-1);
+            });
+            
+            document.getElementById('nextMonthBtn').addEventListener('click', () => {
+                navigateCalendarMonth(1);
+            });
+            
+            document.getElementById('todayCalendarBtn').addEventListener('click', () => {
+                const today = new Date();
+                currentCalendarMonth = today.getMonth();
+                currentCalendarYear = today.getFullYear();
+                renderCalendar(currentCalendarYear, currentCalendarMonth);
+            });
+            
+            document.getElementById('closeCalendarBtn').addEventListener('click', () => {
+                document.getElementById('calendarModal').style.display = 'none';
+            });
+            
+            document.getElementById('calendarModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('calendarModal')) {
+                    document.getElementById('calendarModal').style.display = 'none';
+                }
             });
             
             // 初始化详细数据中的日期范围预设按钮
@@ -1886,6 +2203,20 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false, // 鼠标不需要精确交叉点
+                            bodyFont: {
+                                size: 14 // 增大提示文字大小
+                            },
+                            padding: 10, // 增加提示框内边距
+                            backgroundColor: 'rgba(0,0,0,0.7)',
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y.toFixed(2);
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -1893,13 +2224,44 @@
                             beginAtZero: true,
                             grid: {
                                 color: 'rgba(0,0,0,0.05)'
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12 // 增大刻度字体
+                                },
+                                padding: 8 // 增加刻度与轴的距离
                             }
                         },
                         x: {
                             grid: {
                                 display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12 // 增大刻度字体
+                                },
+                                maxRotation: 30, // 允许标签旋转以避免重叠
+                                padding: 8 // 增加刻度与轴的距离
                             }
                         }
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: false // 不需要精确交叉
+                    },
+                    elements: {
+                        point: {
+                            radius: 4, // 增大点的半径
+                            hoverRadius: 8 // 悬停时增大点的半径
+                        },
+                        line: {
+                            tension: 0.4 // 平滑曲线
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest', // 使用最近点模式
+                        axis: 'xy', // 横纵两轴都检测
+                        intersect: false // 不需要精确交叉
                     }
                 }
             };
@@ -2178,6 +2540,272 @@
 
         // 启动应用
         document.addEventListener('DOMContentLoaded', init);
+
+        // 检测是否为iOS设备
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+
+        // 苹果风格日历选择器全局变量
+        let currentCalendarMonth;
+        let currentCalendarYear;
+        
+        // 显示苹果风格的日历选择器
+        function showAppleCalendar() {
+            const calendarModal = document.getElementById('calendarModal');
+            calendarModal.style.display = 'flex';
+            
+            // 初始化日历为当前选择的日期或今天
+            const date = selectedDate ? new Date(selectedDate) : new Date();
+            currentCalendarMonth = date.getMonth();
+            currentCalendarYear = date.getFullYear();
+            
+            // 渲染日历
+            renderCalendar(currentCalendarYear, currentCalendarMonth);
+        }
+        
+        // 渲染日历
+        function renderCalendar(year, month, animation = '') {
+            const calendarDays = document.getElementById('calendarDays');
+            const currentMonthYear = document.getElementById('currentMonthYear');
+            
+            // 清空现有内容并应用动画类
+            calendarDays.innerHTML = '';
+            calendarDays.className = 'calendar-days';
+            
+            if (animation) {
+                calendarDays.classList.add(animation);
+            }
+            
+            // 设置当前月份和年份显示
+            const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+            currentMonthYear.textContent = `${year}年${monthNames[month]}`;
+            
+            // 计算当月第一天
+            const firstDay = new Date(year, month, 1);
+            
+            // 计算当月有多少天
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            // 获取当月第一天是星期几 (0-6, 0 为星期日)
+            const firstDayIndex = firstDay.getDay();
+            
+            // 获取上个月的最后几天，用于填充当月第一周
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+            
+            // 计算需要显示的上个月天数
+            const prevMonthDays = firstDayIndex;
+            
+            // 获取今天的日期信息，用于高亮今天
+            const today = new Date();
+            const todayDate = today.getDate();
+            const todayMonth = today.getMonth();
+            const todayYear = today.getFullYear();
+            
+            // 获取当前选择日期的信息
+            const selectedDateObj = selectedDate ? new Date(selectedDate) : null;
+            const selectedDay = selectedDateObj ? selectedDateObj.getDate() : null;
+            const selectedMonth = selectedDateObj ? selectedDateObj.getMonth() : null;
+            const selectedYear = selectedDateObj ? selectedDateObj.getFullYear() : null;
+            
+            // 生成日历网格，先填充上个月的最后几天
+            for (let i = prevMonthDays - 1; i >= 0; i--) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('calendar-day', 'other-month');
+                dayElement.textContent = prevMonthLastDay - i;
+                
+                // 添加点击事件
+                const prevMonth = month === 0 ? 11 : month - 1;
+                const prevYear = month === 0 ? year - 1 : year;
+                dayElement.addEventListener('click', () => selectDate(prevYear, prevMonth, prevMonthLastDay - i));
+                
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // 填充当月的天数
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('calendar-day');
+                dayElement.textContent = i;
+                
+                // 如果是今天，添加特殊样式
+                if (i === todayDate && month === todayMonth && year === todayYear) {
+                    dayElement.classList.add('today');
+                }
+                
+                // 如果是选中的日期，添加选中样式
+                if (i === selectedDay && month === selectedMonth && year === selectedYear) {
+                    dayElement.classList.add('selected');
+                }
+                
+                // 添加点击事件
+                dayElement.addEventListener('click', () => selectDate(year, month, i));
+                
+                calendarDays.appendChild(dayElement);
+            }
+            
+            // 填充下个月的前几天，直到日历网格填满
+            const totalDaysDisplayed = prevMonthDays + daysInMonth;
+            const nextMonthDays = 42 - totalDaysDisplayed > 7 ? 42 - 7 - totalDaysDisplayed : 42 - totalDaysDisplayed;
+            
+            for (let i = 1; i <= nextMonthDays; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('calendar-day', 'other-month');
+                dayElement.textContent = i;
+                
+                // 添加点击事件
+                const nextMonth = month === 11 ? 0 : month + 1;
+                const nextYear = month === 11 ? year + 1 : year;
+                dayElement.addEventListener('click', () => selectDate(nextYear, nextMonth, i));
+                
+                calendarDays.appendChild(dayElement);
+            }
+        }
+        
+        // 选择日期
+        function selectDate(year, month, day) {
+            // 格式化日期为YYYY-MM-DD格式
+            const date = new Date(year, month, day);
+            const formattedDate = date.toISOString().split('T')[0];
+            
+            // 更新选中日期
+            selectedDate = formattedDate;
+            datePicker.value = formattedDate;
+            dateDisplay.textContent = formatDate(formattedDate);
+            
+            // 关闭日历模态框
+            document.getElementById('calendarModal').style.display = 'none';
+            
+            // 更新UI
+            updateUI();
+            
+            // 添加选择确认的视觉效果
+            const dateDisplayElement = document.querySelector('.date-display');
+            dateDisplayElement.classList.add('date-selected');
+            setTimeout(() => {
+                dateDisplayElement.classList.remove('date-selected');
+                dateDisplayElement.classList.remove('date-select-animation');
+            }, 500);
+        }
+        
+        // 导航日历月份
+        function navigateCalendarMonth(direction) {
+            // 更新当前月份
+            if (direction === 1) {
+                // 前进一个月
+                if (currentCalendarMonth === 11) {
+                    currentCalendarMonth = 0;
+                    currentCalendarYear++;
+                } else {
+                    currentCalendarMonth++;
+                }
+                renderCalendar(currentCalendarYear, currentCalendarMonth, 'slide-left');
+            } else {
+                // 后退一个月
+                if (currentCalendarMonth === 0) {
+                    currentCalendarMonth = 11;
+                    currentCalendarYear--;
+                } else {
+                    currentCalendarMonth--;
+                }
+                renderCalendar(currentCalendarYear, currentCalendarMonth, 'slide-right');
+            }
+        }
+
+        // 显示iOS风格的日期选择器
+        function showIOSDatePicker() {
+            // 如果已经存在，先移除旧的
+            const oldPicker = document.getElementById('ios-date-picker-overlay');
+            if (oldPicker) oldPicker.remove();
+            
+            // 创建日期选择覆盖层
+            const overlay = document.createElement('div');
+            overlay.id = 'ios-date-picker-overlay';
+            overlay.className = 'modal';
+            overlay.style.display = 'flex';
+            overlay.style.zIndex = '10000';
+            
+            const currentDate = datePicker.value ? new Date(datePicker.value) : new Date();
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const day = currentDate.getDate();
+            
+            // 创建内容
+            const content = document.createElement('div');
+            content.className = 'reset-modal-content';
+            content.style.padding = '20px';
+            
+            // 添加标题
+            const title = document.createElement('div');
+            title.style.fontSize = '18px';
+            title.style.fontWeight = '600';
+            title.style.marginBottom = '20px';
+            title.style.textAlign = 'center';
+            title.textContent = '选择日期';
+            content.appendChild(title);
+            
+            // 添加原生日期输入
+            const dateInput = document.createElement('input');
+            dateInput.type = 'date';
+            dateInput.value = datePicker.value;
+            dateInput.style.width = '100%';
+            dateInput.style.fontSize = '16px';
+            dateInput.style.padding = '12px';
+            dateInput.style.borderRadius = '12px';
+            dateInput.style.border = '1px solid rgba(0,0,0,0.1)';
+            dateInput.style.marginBottom = '20px';
+            dateInput.style.webkitAppearance = 'none';
+            content.appendChild(dateInput);
+            
+            // 添加按钮
+            const btnContainer = document.createElement('div');
+            btnContainer.style.display = 'flex';
+            btnContainer.style.justifyContent = 'space-between';
+            btnContainer.style.gap = '12px';
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = '取消';
+            cancelBtn.className = 'btn btn-cancel';
+            cancelBtn.style.flex = '1';
+            
+            const confirmBtn = document.createElement('button');
+            confirmBtn.textContent = '确认';
+            confirmBtn.className = 'btn btn-save';
+            confirmBtn.style.flex = '1';
+            
+            btnContainer.appendChild(cancelBtn);
+            btnContainer.appendChild(confirmBtn);
+            content.appendChild(btnContainer);
+            
+            overlay.appendChild(content);
+            document.body.appendChild(overlay);
+            
+            // 添加事件监听
+            cancelBtn.addEventListener('click', () => {
+                overlay.remove();
+            });
+            
+            confirmBtn.addEventListener('click', () => {
+                if (dateInput.value) {
+                    datePicker.value = dateInput.value;
+                    selectedDate = dateInput.value;
+                    document.querySelector('.date-display-text').textContent = formatDate(dateInput.value);
+                    updateUI();
+                }
+                overlay.remove();
+            });
+            
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+            
+            // 自动聚焦
+            setTimeout(() => dateInput.focus(), 300);
+        }
     </script>
 </body>
 </html>
