@@ -700,55 +700,58 @@
       }
       
       .date-range-selector {
-          background-color: rgba(250, 250, 250, 0.8);
+          background-color: rgba(255, 255, 255, 0.9);
           border-radius: 16px;
-          margin: 0 16px 20px;  /* 减小边距 */
-          padding: 14px;  /* 减小内边距 */
-          box-shadow: 0 1px 5px rgba(0,0,0,0.03);
-          backdrop-filter: blur(5px);
-          -webkit-backdrop-filter: blur(5px);
+          margin: 16px 0;
+          padding: 20px;
+          box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(0,0,0,0.05);
       }
       
       .date-range-title {
-          font-size: 15px;  /* 减小字体大小 */
+          font-size: 16px;
           font-weight: 600;
-          color: var(--system-gray-5);
-          margin-bottom: 12px;  /* 减小底部边距 */
-          text-align: center;
+          color: var(--black);
+          margin-bottom: 16px;
+          letter-spacing: -0.3px;
       }
       
       .date-range-buttons {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 8px;  /* 减小间距 */
-          margin-bottom: 16px;  /* 减小底部边距 */
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 20px;
       }
       
       .range-preset-button {
-          padding: 10px 6px;  /* 减小内边距 */
-          background-color: rgba(240, 240, 245, 0.8);
-          border: none;
-          border-radius: 10px;  /* 减小圆角 */
-          font-size: 14px;  /* 减小字体大小 */
+          flex: 1;
+          min-width: calc(33.333% - 8px);
+          padding: 10px 0;
+          background-color: rgba(242, 242, 247, 0.9);
+          border: 1px solid rgba(0,0,0,0.05);
+          border-radius: 10px;
+          font-size: 14px;
           font-weight: 500;
-          color: var(--primary-blue);
+          color: var(--black);
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
           text-align: center;
-          min-height: 38px;  /* 减小最小高度但仍保持适合触控 */
       }
       
       .range-preset-button:active,
       .range-preset-button.active {
           background-color: var(--primary-blue);
           color: var(--white);
-          transform: scale(0.97);
+          transform: scale(0.98);
+          border-color: var(--primary-blue);
       }
       
       .custom-range-inputs {
           display: flex;
           gap: 10px;
-          margin-bottom: 18px;
+          margin-bottom: 20px;
       }
       
       .date-input-wrapper {
@@ -758,22 +761,22 @@
       
       .date-range-input {
           width: 100%;
-          padding: 12px 14px;
+          padding: 12px 16px;
           border: 1px solid rgba(0,0,0,0.05);
           border-radius: 12px;
-          font-size: 16px;
-          background-color: rgba(240, 240, 245, 0.6);
-          transition: all 0.2s;
-          -webkit-appearance: none; /* 移除iOS默认样式 */
+          font-size: 15px;
+          background-color: rgba(242, 242, 247, 0.8);
+          transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+          -webkit-appearance: none;
           appearance: none;
-          height: 44px; /* 固定高度 */
+          color: var(--black);
       }
       
       .date-range-input:focus {
           outline: none;
           border-color: var(--primary-blue);
-          background-color: rgba(240, 240, 245, 0.8);
-          box-shadow: 0 0 0 2px rgba(0,122,255,0.1);
+          background-color: rgba(240, 240, 245, 0.9);
+          box-shadow: 0 0 0 3px rgba(0,122,255,0.15);
       }
       
       .date-input-label {
@@ -783,17 +786,18 @@
           font-size: 12px;
           font-weight: 500;
           color: var(--system-gray-4);
-          background-color: rgba(240, 240, 245, 0.8);
-          padding: 0 4px;
+          background-color: rgba(255, 255, 255, 0.9);
+          padding: 0 5px;
           border-radius: 4px;
+          z-index: 1;
       }
       
       .apply-dates-button {
           width: 100%;
           background-color: var(--primary-blue);
           color: var(--white);
-          padding: 12px;
-          border-radius: 12px;
+          padding: 14px;
+          border-radius: 14px;
           font-size: 16px;
           font-weight: 500;
           cursor: pointer;
@@ -802,12 +806,13 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          box-shadow: 0 2px 8px rgba(0,122,255,0.25);
       }
       
       .apply-dates-button:active {
-          transform: scale(0.98);
+          transform: scale(0.97);
           background-color: #0066CC;
+          box-shadow: 0 1px 4px rgba(0,122,255,0.15);
       }
       
       /* 优化图表容器 */
@@ -1391,7 +1396,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="amount">金额</label>
-                            <input type="number" id="amount" placeholder="输入金额" min="0" step="0.01">
+                            <input type="number" id="amount" placeholder="输入金额" min="0" step="0.01" inputmode="numeric" pattern="[0-9]*">
                         </div>
                         <div class="form-group">
                             <label>类型</label>
@@ -1663,6 +1668,13 @@
         // 初始化
         async function init() {
             showLoader(true);
+            // 确保每次初始化时都使用当天日期
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            selectedDate = `${yyyy}-${mm}-${dd}`;
+            
             datePicker.value = selectedDate;
             dateDisplay.textContent = formatDate(selectedDate);
             
@@ -1826,6 +1838,16 @@
                             loadRecordsFromFirebase(),
                             new Promise(resolve => setTimeout(resolve, 100)) // 添加小延迟确保UI更新
                         ]);
+                        
+                        // 确保登录后也是当天日期
+                        const today = new Date();
+                        const yyyy = today.getFullYear();
+                        const mm = String(today.getMonth() + 1).padStart(2, '0');
+                        const dd = String(today.getDate()).padStart(2, '0');
+                        selectedDate = `${yyyy}-${mm}-${dd}`;
+                        datePicker.value = selectedDate;
+                        dateDisplay.textContent = formatDate(selectedDate);
+                        
                         updateUI();
                     } catch (error) {
                         console.error("加载数据失败:", error);
@@ -2537,6 +2559,15 @@
                             setTimeout(() => reject(new Error('登录超时')), 5000)
                         )
                     ]);
+                    
+                    // 自动登录成功后，确保日期是当天
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    selectedDate = `${yyyy}-${mm}-${dd}`;
+                    datePicker.value = selectedDate;
+                    dateDisplay.textContent = formatDate(selectedDate);
                 } catch (error) {
                     console.error("自动登录失败:", error);
                     // 清除可能过期的登录信息
