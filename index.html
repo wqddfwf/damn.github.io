@@ -401,7 +401,7 @@
           font-size: 16px;
       }
       
-      /* 优化的添加按钮 */
+      /* 改进添加按钮样式 */
       .add-button {
           position: fixed;
           bottom: calc(24px + env(safe-area-inset-bottom));
@@ -415,19 +415,19 @@
           align-items: center;
           justify-content: center;
           font-size: 28px;
-          box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+          box-shadow: 0 4px 16px rgba(0,122,255,0.3);
           border: none;
           cursor: pointer;
           z-index: 10;
-          transition: all 0.2s;
+          transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
       }
       
-      .add-button:hover {
-          transform: scale(1.05);
-          box-shadow: 0 6px 16px rgba(0,122,255,0.4);
+      .add-button:active {
+          transform: scale(0.95);
+          box-shadow: 0 2px 8px rgba(0,122,255,0.2);
       }
       
-      /* 模态框样式 */
+      /* 改进模态框样式 - 苹果风格 */
       .modal {
           position: fixed;
           top: 0;
@@ -435,6 +435,8 @@
           right: 0;
           bottom: 0;
           background-color: rgba(0,0,0,0.5);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -447,38 +449,35 @@
           background-color: var(--white);
           width: calc(100% - 40px);
           max-width: 400px;
-          border-radius: 12px;
+          border-radius: 16px;
           overflow: hidden;
-          animation: modal-appear 0.3s ease-out;
+          animation: modal-appear 0.3s cubic-bezier(0.25, 1, 0.5, 1);
           margin: auto;
-      }
-      
-      @keyframes modal-appear {
-          from { transform: scale(0.95); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
+          box-shadow: 0 8px 30px rgba(0,0,0,0.12);
       }
       
       .modal-header {
-          padding: 16px;
+          padding: 18px 20px;
           font-size: 20px;
           font-weight: 600;
           border-bottom: 1px solid var(--system-gray-1);
           display: flex;
           justify-content: space-between;
           align-items: center;
+          color: var(--black);
       }
       
       .modal-body {
-          padding: 16px;
+          padding: 20px;
       }
       
       .form-group {
-          margin-bottom: 16px;
+          margin-bottom: 20px;
       }
       
       .form-group label {
           display: block;
-          margin-bottom: 8px;
+          margin-bottom: 10px;
           color: var(--system-gray-5);
           font-size: 15px;
           font-weight: 500;
@@ -486,24 +485,31 @@
       
       .form-group input {
           width: 100%;
-          padding: 12px;
+          padding: 14px;
           border: 1px solid var(--system-gray-2);
-          border-radius: 8px;
+          border-radius: 10px;
           font-size: 16px;
           background-color: var(--system-gray-1);
+          transition: all 0.2s;
+      }
+      
+      .form-group input:focus {
+          outline: none;
+          border-color: var(--primary-blue);
+          box-shadow: 0 0 0 2px rgba(0,122,255,0.1);
       }
       
       .type-options {
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
+          gap: 10px;
       }
       
       .type-option {
-          padding: 8px 16px;
+          padding: 10px 14px;
           border: 1px solid var(--system-gray-2);
-          border-radius: 8px;
-          font-size: 14px;
+          border-radius: 10px;
+          font-size: 15px;
           cursor: pointer;
           background-color: var(--system-gray-1);
           transition: all 0.2s;
@@ -513,92 +519,127 @@
           background-color: var(--primary-blue);
           color: var(--white);
           border-color: var(--primary-blue);
+          font-weight: 500;
       }
       
-      .type-option:hover {
-          background-color: var(--system-gray-2);
+      .type-option:active {
+          transform: scale(0.98);
       }
       
       .modal-footer {
           display: flex;
           justify-content: flex-end;
-          padding: 16px;
+          padding: 16px 20px;
           border-top: 1px solid var(--system-gray-1);
-          gap: 8px;
+          gap: 10px;
       }
       
       .btn {
-          padding: 10px 16px;
-          border-radius: 8px;
+          padding: 12px 20px;
+          border-radius: 10px;
           font-size: 16px;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s;
+          border: none;
       }
       
       .btn-cancel {
-          background-color: transparent;
-          color: var(--system-gray-5);
+          background-color: var(--system-gray-1);
+          color: var(--system-gray-6);
       }
       
-      .btn-cancel:hover {
-          background-color: var(--system-gray-1);
+      .btn-cancel:active {
+          background-color: var(--system-gray-2);
+          transform: scale(0.98);
       }
       
       .btn-save {
           background-color: var(--primary-blue);
           color: var(--white);
-          border: none;
       }
       
-      .btn-save:hover {
+      .btn-save:active {
           background-color: #0066CC;
+          transform: scale(0.98);
       }
       
-      .delete-btn {
-          color: var(--primary-red);
-          background: none;
-          border: none;
-          padding: 8px;
-          cursor: pointer;
-          font-size: 16px;
-          border-radius: 6px;
-          transition: all 0.2s;
-      }
-      
-      .delete-btn:hover {
-          background-color: rgba(255,59,48,0.1);
-      }
-
-      /* 详细数据模态框 */
+      /* 详细数据模态框改进 */
       .details-modal-content {
           max-width: 600px;
           width: calc(100% - 40px);
-          max-height: 80vh;
+          max-height: 85vh;
           overflow-y: auto;
+      }
+      
+      .summary-stats {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 20px;
+          gap: 12px;
+      }
+      
+      .stat-card {
+          flex: 1;
+          padding: 16px;
+          background-color: var(--white);
+          border-radius: 12px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+      }
+      
+      .stat-label {
+          font-size: 14px;
+          color: var(--system-gray-4);
+          margin-bottom: 6px;
+          font-weight: 500;
+      }
+      
+      .stat-value {
+          font-size: 22px;
+          font-weight: 600;
+      }
+      
+      .stat-value.income {
+          color: var(--primary-green);
+      }
+      
+      .stat-value.expense {
+          color: var(--primary-red);
+      }
+      
+      .stat-value.profit {
+          color: var(--primary-blue);
       }
       
       .range-picker {
           display: flex;
           gap: 12px;
-          margin-bottom: 20px;
+          margin-bottom: 24px;
       }
       
       .range-picker input {
           flex: 1;
-          padding: 12px;
+          padding: 12px 14px;
           border: 1px solid var(--system-gray-2);
-          border-radius: 8px;
+          border-radius: 10px;
           font-size: 16px;
           background-color: var(--system-gray-1);
       }
       
+      .range-picker input:focus {
+          outline: none;
+          border-color: var(--primary-blue);
+      }
+      
       .chart-container {
-          margin: 20px 0;
+          margin: 24px 0;
           padding: 20px;
           background-color: var(--white);
           border-radius: 16px;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       }
       
       .chart-title {
@@ -611,51 +652,10 @@
       
       .chart-wrapper {
           position: relative;
-          height: 300px;
-          margin-bottom: 20px;
+          height: 260px;
+          margin-bottom: 10px;
       }
       
-      .chart-summary {
-          display: flex;
-          justify-content: space-between;
-          padding: 16px;
-          background-color: var(--system-gray-1);
-          border-radius: 12px;
-          margin-top: 16px;
-      }
-      
-      .chart-summary-item {
-          text-align: center;
-          flex: 1;
-      }
-      
-      .chart-summary-label {
-          font-size: 14px;
-          color: var(--system-gray-4);
-          margin-bottom: 4px;
-      }
-      
-      .chart-summary-value {
-          font-size: 18px;
-          font-weight: 600;
-      }
-      
-      .chart-summary-value.income {
-          color: var(--primary-green);
-      }
-      
-      .chart-summary-value.expense {
-          color: var(--primary-red);
-      }
-      
-      .chart-summary-value.profit {
-          color: var(--primary-blue);
-      }
-      
-      canvas {
-          max-width: 100%;
-      }
-
       /* 针对iOS PWA的优化 */
       @supports (-webkit-touch-callout: none) {
           body {
@@ -875,7 +875,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="amount">金额</label>
-                            <input type="number" id="amount" placeholder="输入金额">
+                            <input type="number" id="amount" placeholder="输入金额" min="0" step="0.01">
                         </div>
                         <div class="form-group">
                             <label>类型</label>
@@ -902,40 +902,44 @@
                         <button class="btn btn-cancel" id="detailsCloseBtn">关闭</button>
                     </div>
                     <div class="modal-body">
+                        <div class="summary-stats">
+                            <div class="stat-card">
+                                <div class="stat-label">总收入</div>
+                                <div class="stat-value income" id="totalIncome">0.00</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">总费用</div>
+                                <div class="stat-value expense" id="totalExpense">0.00</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">总利润</div>
+                                <div class="stat-value profit" id="totalProfit">0.00</div>
+                            </div>
+                        </div>
+                        
                         <div class="range-picker">
                             <input type="date" id="startDate" placeholder="开始日期">
                             <input type="date" id="endDate" placeholder="结束日期">
                         </div>
+                        
                         <div class="chart-container">
-                            <div class="chart-title">近7天利润趋势</div>
+                            <div class="chart-title">利润趋势</div>
                             <div class="chart-wrapper">
                                 <canvas id="profitChart"></canvas>
                             </div>
                         </div>
+                        
                         <div class="chart-container">
-                            <div class="chart-title">近7天收入趋势</div>
+                            <div class="chart-title">收入趋势</div>
                             <div class="chart-wrapper">
                                 <canvas id="incomeChart"></canvas>
                             </div>
                         </div>
+                        
                         <div class="chart-container">
-                            <div class="chart-title">近7天费用趋势</div>
+                            <div class="chart-title">费用趋势</div>
                             <div class="chart-wrapper">
                                 <canvas id="expenseChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="chart-summary">
-                            <div class="chart-summary-item">
-                                <div class="chart-summary-label">总收入</div>
-                                <div class="chart-summary-value income" id="totalIncome">0.00</div>
-                            </div>
-                            <div class="chart-summary-item">
-                                <div class="chart-summary-label">总费用</div>
-                                <div class="chart-summary-value expense" id="totalExpense">0.00</div>
-                            </div>
-                            <div class="chart-summary-item">
-                                <div class="chart-summary-label">总利润</div>
-                                <div class="chart-summary-value profit" id="totalProfit">0.00</div>
                             </div>
                         </div>
                     </div>
@@ -1714,14 +1718,6 @@
             profitChart.update();
             incomeChart.update();
             expenseChart.update();
-            
-            console.log("图表已更新", {
-                labels: last7Days.map(date => formatDate(date)),
-                profitData: last7Days.map(date => dailyData[date].profit),
-                incomeData: last7Days.map(date => dailyData[date].income),
-                expenseData: last7Days.map(date => dailyData[date].expense),
-                totals
-            });
         }
 
         // 主界面导出为CSV
