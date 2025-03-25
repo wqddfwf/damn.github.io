@@ -1,363 +1,611 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#007AFF">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="记账">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon.png">
-    <meta name="mobile-web-app-capable" content="yes">
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <title>每日记账</title>
-    <style>
-        :root {
-            --primary-blue: #007AFF;
-            --primary-red: #FF3B30;
-            --primary-green: #34C759;
-            --primary-orange: #FF9500;
-            --system-gray-1: #F5F5F5;
-            --system-gray-2: #E5E5EA;
-            --system-gray-3: #D1D1D6;
-            --system-gray-4: #8E8E93;
-            --system-gray-5: #636366;
-            --black: #1C2526;
-            --white: #FFFFFF;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- PWA 必需标签 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007AFF">
 
-        body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--system-gray-1);
-            color: var(--black);
-            margin: 0;
-            padding: 0;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            max-width: 100%;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-            line-height: 1.5;
-        }
+  <!-- iOS 额外支持 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="记账">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon.png">
 
-        .container {
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            padding-bottom: 100px;
-        }
+  <!-- 安卓/通用 PWA 支持 -->
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- 添加Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  
+  <!-- 添加SheetJS库用于Excel导出 -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+  
+  <!-- 添加Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <title>每日记账</title>
+  <style>
+      :root {
+          --primary-blue: #007AFF;
+          --primary-red: #FF3B30;
+          --primary-green: #34C759;
+          --primary-orange: #FF9500;
+          --system-gray-1: #F2F2F7;
+          --system-gray-2: #E5E5EA;
+          --system-gray-3: #D1D1D6;
+          --system-gray-4: #8E8E93;
+          --system-gray-5: #636366;
+          --system-gray-6: #48484A;
+          --white: #FFFFFF;
+          --black: #000000;
+      }
+      
+      body {
+          font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+          background-color: var(--system-gray-1);
+          color: var(--black);
+          margin: 0;
+          padding: 0;
+          max-width: 100%;
+          overflow-x: hidden;
+          -webkit-tap-highlight-color: transparent;
+          line-height: 1.5;
+          padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+      
+      .container {
+          padding: 20px;
+          max-width: 600px;
+          margin: 0 auto;
+          padding-bottom: 100px;
+      }
+      
+      .header {
+          font-size: 28px;
+          font-weight: 600;
+          margin-bottom: 24px;
+          text-align: center;
+          color: var(--black);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+      
+      .logout-button {
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 8px;
+          display: flex;
+          align-items: center;
+      }
+      
+      .logout-button:hover {
+          background-color: var(--system-gray-2);
+          border-radius: 50%;
+      }
 
-        .header {
-            font-size: 34px;
-            font-weight: 700;
-            padding: 20px 0;
-            text-align: center;
-            color: var(--black);
-        }
+      /* 简化的登录界面 */
+      .auth-card {
+          background-color: var(--white);
+          border-radius: 12px;
+          padding: 24px;
+          margin: 40px 20px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+          max-width: 400px;
+          margin-left: auto;
+          margin-right: auto;
+      }
+      
+      .auth-title {
+          font-size: 22px;
+          font-weight: 600;
+          margin-bottom: 24px;
+          text-align: center;
+          color: var(--black);
+      }
+      
+      .auth-form {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+      }
+      
+      .auth-input {
+          padding: 14px;
+          border: 1px solid var(--system-gray-2);
+          border-radius: 8px;
+          font-size: 16px;
+          background-color: var(--system-gray-1);
+          transition: border-color 0.2s;
+          width: 100%;
+          box-sizing: border-box;
+      }
+      
+      .auth-input:focus {
+          outline: none;
+          border-color: var(--primary-blue);
+      }
+      
+      .auth-button {
+          padding: 14px;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+          border: none;
+          transition: all 0.2s;
+          width: 100%;
+      }
+      
+      .login-button {
+          background-color: var(--primary-blue);
+          color: var(--white);
+          margin-top: 8px;
+      }
+      
+      .login-button:hover {
+          background-color: #0066CC;
+      }
+      
+      .forgot-password {
+          color: var(--primary-blue);
+          font-size: 14px;
+          text-align: center;
+          margin-top: 12px;
+          cursor: pointer;
+      }
+      
+      /* 主应用内容 */
+      .date-picker {
+          margin-bottom: 20px;
+          background-color: var(--white);
+          padding: 16px;
+          border-radius: 12px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      }
+      
+      .date-picker-button {
+          background: none;
+          border: none;
+          padding: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 16px;
+          color: var(--primary-blue);
+      }
+      
+      .date-picker-button:hover {
+          background-color: var(--system-gray-2);
+          border-radius: 8px;
+      }
+      
+      .hidden-date-input {
+          display: none;
+      }
+      
+      .summary-card {
+          background-color: var(--white);
+          border-radius: 12px;
+          padding: 20px;
+          margin-bottom: 20px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      }
+      
+      .summary-title {
+          font-size: 17px;
+          color: var(--system-gray-4);
+          margin-bottom: 16px;
+          text-align: center;
+          font-weight: 500;
+      }
+      
+      .summary-items {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+      }
+      
+      .summary-item {
+          flex: 1;
+          text-align: center;
+          padding: 12px;
+          border-radius: 8px;
+          background-color: var(--system-gray-1);
+      }
+      
+      .summary-item-title {
+          font-size: 14px;
+          color: var(--system-gray-4);
+          margin-bottom: 6px;
+      }
+      
+      .summary-item-value {
+          font-size: 20px;
+          font-weight: 600;
+      }
+      
+      .records-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+      }
+      
+      .records-title {
+          font-size: 17px;
+          color: var(--system-gray-4);
+          font-weight: 500;
+      }
+      
+      .export-dropdown {
+          position: relative;
+          display: inline-block;
+      }
+      
+      .export-button {
+          padding: 8px 16px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          border: 1px solid var(--system-gray-2);
+          background-color: var(--white);
+          color: var(--primary-blue);
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+      }
+      
+      .export-button:hover {
+          background-color: var(--system-gray-1);
+      }
+      
+      .dropdown-content {
+          display: none;
+          position: absolute;
+          right: 0;
+          background-color: var(--white);
+          min-width: 120px;
+          box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+          border-radius: 8px;
+          z-index: 1;
+          overflow: hidden;
+      }
+      
+      .dropdown-content a {
+          color: var(--system-gray-6);
+          padding: 12px 16px;
+          text-decoration: none;
+          display: block;
+          font-size: 14px;
+          transition: background-color 0.2s;
+      }
+      
+      .dropdown-content a:hover {
+          background-color: var(--system-gray-1);
+      }
+      
+      .export-dropdown:hover .dropdown-content {
+          display: block;
+      }
+      
+      .records-list {
+          background-color: var(--white);
+          border-radius: 12px;
+          overflow: hidden;
+          margin-bottom: 20px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      }
+      
+      .record-item {
+          padding: 16px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid var(--system-gray-1);
+      }
+      
+      .record-item:last-child {
+          border-bottom: none;
+      }
+      
+      .record-type {
+          font-size: 16px;
+          flex: 1;
+      }
+      
+      .record-amount.income {
+          color: var(--primary-green);
+          font-weight: 500;
+      }
+      
+      .record-amount.expense {
+          color: var(--primary-red);
+          font-weight: 500;
+      }
+      
+      .no-records {
+          text-align: center;
+          color: var(--system-gray-4);
+          padding: 24px;
+          font-size: 16px;
+      }
+      
+      /* 优化的添加按钮 */
+      .add-button {
+          position: fixed;
+          bottom: calc(24px + env(safe-area-inset-bottom));
+          right: 24px;
+          width: 60px;
+          height: 60px;
+          background: linear-gradient(135deg, var(--primary-blue), #0066CC);
+          color: var(--white);
+          border-radius: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+          border: none;
+          cursor: pointer;
+          z-index: 10;
+          transition: all 0.2s;
+      }
+      
+      .add-button:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 16px rgba(0,122,255,0.4);
+      }
+      
+      /* 模态框样式 */
+      .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0,0,0,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 100;
+          display: none;
+          padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+      
+      .modal-content {
+          background-color: var(--white);
+          width: calc(100% - 40px);
+          max-width: 400px;
+          border-radius: 12px;
+          overflow: hidden;
+          animation: modal-appear 0.3s ease-out;
+          margin: auto;
+      }
+      
+      @keyframes modal-appear {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+      }
+      
+      .modal-header {
+          padding: 16px;
+          font-size: 20px;
+          font-weight: 600;
+          border-bottom: 1px solid var(--system-gray-1);
+      }
+      
+      .modal-body {
+          padding: 16px;
+      }
+      
+      .form-group {
+          margin-bottom: 16px;
+      }
+      
+      .form-group label {
+          display: block;
+          margin-bottom: 8px;
+          color: var(--system-gray-5);
+          font-size: 15px;
+          font-weight: 500;
+      }
+      
+      .form-group input {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid var(--system-gray-2);
+          border-radius: 8px;
+          font-size: 16px;
+          background-color: var(--system-gray-1);
+      }
+      
+      .type-options {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+      }
+      
+      .type-option {
+          padding: 8px 16px;
+          border: 1px solid var(--system-gray-2);
+          border-radius: 8px;
+          font-size: 14px;
+          cursor: pointer;
+          background-color: var(--system-gray-1);
+          transition: all 0.2s;
+      }
+      
+      .type-option.selected {
+          background-color: var(--primary-blue);
+          color: var(--white);
+          border-color: var(--primary-blue);
+      }
+      
+      .type-option:hover {
+          background-color: var(--system-gray-2);
+      }
+      
+      .modal-footer {
+          display: flex;
+          justify-content: flex-end;
+          padding: 16px;
+          border-top: 1px solid var(--system-gray-1);
+          gap: 8px;
+      }
+      
+      .btn {
+          padding: 10px 16px;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+      }
+      
+      .btn-cancel {
+          background-color: transparent;
+          color: var(--system-gray-5);
+      }
+      
+      .btn-cancel:hover {
+          background-color: var(--system-gray-1);
+      }
+      
+      .btn-save {
+          background-color: var(--primary-blue);
+          color: var(--white);
+          border: none;
+      }
+      
+      .btn-save:hover {
+          background-color: #0066CC;
+      }
+      
+      .delete-btn {
+          color: var(--primary-red);
+          background: none;
+          border: none;
+          padding: 8px;
+          cursor: pointer;
+          font-size: 16px;
+          border-radius: 6px;
+          transition: all 0.2s;
+      }
+      
+      .delete-btn:hover {
+          background-color: rgba(255,59,48,0.1);
+      }
 
-        /* 登录界面 */
-        .auth-card {
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 18px;
-            padding: 28px;
-            margin: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-
-        .auth-title {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            text-align: center;
-            color: var(--black);
-        }
-
-        .auth-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .auth-input {
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-size: 17px;
-            background-color: #F7F7F7;
-            transition: all 0.2s;
-        }
-
-        .auth-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--primary-blue);
-        }
-
-        .auth-button {
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 17px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-        }
-
-        .login-button {
-            background-color: var(--primary-blue);
-            color: var(--white);
-            margin-top: 20px;
-        }
-
-        .login-button:hover {
-            background-color: #0066CC;
-        }
-
-        .forgot-password {
-            color: var(--primary-blue);
-            font-size: 15px;
-            text-align: right;
-            margin-top: 12px;
-            cursor: pointer;
-        }
-
-        .error-message {
-            color: var(--primary-red);
-            font-size: 14px;
-            text-align: center;
-            margin-top: 12px;
-        }
-
-        /* 主界面 */
-        .logout-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
-        .logout-button {
-            background-color: transparent;
-            color: var(--system-gray-4);
-            font-size: 15px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            transition: all 0.2s;
-        }
-
-        .logout-button:hover {
-            background-color: rgba(0,0,0,0.05);
-            color: var(--primary-red);
-        }
-
-        .date-picker {
-            background-color: transparent;
-            margin-bottom: 24px;
-            box-shadow: none;
-        }
-
-        .date-picker input {
-            width: 100%;
-            padding: 12px 16px;
-            border: none;
-            border-radius: 10px;
-            font-size: 17px;
-            background-color: var(--white);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .summary-card {
-            background-color: var(--white);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .summary-title {
-            font-size: 17px;
-            color: var(--system-gray-4);
-            margin-bottom: 16px;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .summary-items {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .summary-item {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            border-radius: 8px;
-            background-color: #F7F7F7;
-        }
-
-        .records-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .records-title {
-            font-size: 17px;
-            color: var(--system-gray-4);
-            font-weight: 500;
-        }
-
-        .export-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .export-button {
-            background-color: var(--white);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 15px;
-            color: var(--primary-blue);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .export-button:hover {
-            background-color: #F7F7F7;
-        }
-
-        .export-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            margin-top: 8px;
-            background-color: var(--white);
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            min-width: 120px;
-            z-index: 10;
-        }
-
-        .export-dropdown button {
-            display: block;
-            width: 100%;
-            padding: 10px 16px;
-            border: none;
-            background: none;
-            text-align: left;
-            font-size: 15px;
-            color: var(--primary-blue);
-            transition: all 0.2s;
-        }
-
-        .export-dropdown button:hover {
-            background-color: #F7F7F7;
-        }
-
-        .records-list {
-            background-color: var(--white);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .add-button {
-            position: fixed;
-            bottom: calc(30px + env(safe-area-inset-bottom));
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #007AFF, #00A1FF);
-            color: var(--white);
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 15px rgba(0,122,255,0.4);
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .add-button:hover {
-            background: linear-gradient(135deg, #0066CC, #0088DD);
-            transform: scale(1.05);
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            display: none;
-        }
-
-        .modal-content {
-            background-color: var(--white);
-            width: 90%;
-            max-width: 400px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        /* 其他样式保持不变，只列出主要改动部分 */
-        .loader {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .offline-notice {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--primary-orange);
-            color: var(--white);
-            padding: 12px;
-            text-align: center;
-            font-size: 14px;
-            z-index: 5;
-            transform: translateY(100%);
-            transition: transform 0.3s ease-out;
-        }
-
-        .offline-notice.show {
-            transform: translateY(0);
-        }
-    </style>
+      /* 针对iOS PWA的优化 */
+      @supports (-webkit-touch-callout: none) {
+          body {
+              overscroll-behavior-y: contain;
+          }
+      }
+      
+      /* 加载指示器 */
+      .loader {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0,0,0,0.5);
+          z-index: 1000;
+          justify-content: center;
+          align-items: center;
+          padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+      
+      .loader-content {
+          background-color: var(--white);
+          padding: 24px;
+          border-radius: 12px;
+          text-align: center;
+          max-width: 80%;
+      }
+      
+      .loader-spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid var(--system-gray-2);
+          border-top-color: var(--primary-blue);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 16px;
+      }
+      
+      @keyframes spin {
+          to { transform: rotate(360deg); }
+      }
+      
+      .loader-text {
+          font-size: 16px;
+          color: var(--system-gray-5);
+      }
+      
+      /* 离线提示 */
+      .offline-notice {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background-color: var(--primary-orange);
+          color: var(--white);
+          padding: 12px;
+          text-align: center;
+          font-size: 14px;
+          z-index: 5;
+          transform: translateY(100%);
+          transition: transform 0.3s ease-out;
+          padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      }
+      
+      .offline-notice.show {
+          transform: translateY(0);
+      }
+      
+      /* 密码重置模态框 */
+      .reset-modal-content {
+          background-color: var(--white);
+          width: calc(100% - 40px);
+          max-width: 400px;
+          border-radius: 12px;
+          overflow: hidden;
+          margin: auto;
+      }
+      
+      .reset-instructions {
+          font-size: 14px;
+          color: var(--system-gray-4);
+          margin-top: 8px;
+      }
+      
+      /* 响应式调整 */
+      @media (max-width: 400px) {
+          .summary-items {
+              flex-direction: column;
+              gap: 12px;
+          }
+      }
+  </style>
 </head>
 <body>
+    <!-- 加载指示器 -->
     <div class="loader" id="loader">
         <div class="loader-content">
             <div class="loader-spinner"></div>
@@ -365,42 +613,48 @@
         </div>
     </div>
     
+    <!-- 离线提示 -->
     <div class="offline-notice" id="offlineNotice">
         您当前处于离线状态，可以查看最近数据
     </div>
-
+    
     <div class="container">
-        <div class="header">每日记账</div>
-
+        <!-- 认证部分 -->
         <div id="authSection">
             <div class="auth-card">
-                <h2 class="auth-title">登录</h2>
-                <div class="auth-form">
+                <h2 class="auth-title">每日记账</h2>
+                <div id="loginForm" class="auth-form">
                     <input type="email" id="email" class="auth-input" placeholder="电子邮箱">
-                    <div>
-                        <input type="password" id="password" class="auth-input" placeholder="密码">
-                        <div class="forgot-password" id="forgotPassword">忘记密码？</div>
-                    </div>
+                    <input type="password" id="password" class="auth-input" placeholder="密码">
                     <button id="loginButton" class="auth-button login-button">登录</button>
-                    <div id="authError" class="error-message"></div>
+                    <div class="forgot-password" id="forgotPassword">忘记密码？</div>
+                    <div id="authError" class="error-message" style="color: var(--primary-red); text-align: center; font-size: 14px;"></div>
                 </div>
             </div>
         </div>
-
+        
+        <!-- 主应用内容 (默认隐藏，登录后显示) -->
         <div id="appContent" style="display: none;">
-            <div class="logout-container">
-                <button id="logoutButton" class="logout-button">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17 16L21 12M21 12L17 8M21 12H9M13 16V17C13 18.6569 11.6569 20 10 20H7C5.34315 20 4 18.6569 4 17V7C4 5.34315 5.34315 4 7 4H10C11.6569 4 13 5.34315 13 7V8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <div class="header">
+                <span>每日记账</span>
+                <button class="logout-button" id="logoutButton" title="退出登录">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9M16 17L21 12M21 12L16 7M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    退出
                 </button>
             </div>
-
+            
             <div class="date-picker">
-                <input type="date" id="datePicker">
+                <span id="dateDisplay"></span>
+                <button class="date-picker-button" id="datePickerButton">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 10H4M16 2V6M8 2V6M3 6H21V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    选择日期
+                </button>
+                <input type="date" id="datePicker" class="hidden-date-input">
             </div>
-
+            
             <div class="summary-card">
                 <div class="summary-title">概览</div>
                 <div class="summary-items">
@@ -418,33 +672,33 @@
                     </div>
                 </div>
             </div>
-
+            
             <div class="records-header">
                 <div class="records-title">记录</div>
-                <div class="export-container">
-                    <button class="export-button" id="exportBtn">
+                <div class="export-dropdown">
+                    <button class="export-button">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 3V16M12 16L16 12M12 16L8 12M6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         导出
                     </button>
-                    <div class="export-dropdown" id="exportDropdown">
-                        <button id="exportCsv">CSV</button>
-                        <button id="exportExcel">Excel</button>
+                    <div class="dropdown-content">
+                        <a href="#" id="exportCsv">导出为CSV</a>
+                        <a href="#" id="exportExcel">导出为Excel</a>
                     </div>
                 </div>
             </div>
-
             <div class="records-list" id="recordsList">
                 <div class="no-records">暂无记录</div>
             </div>
-
+            
             <button class="add-button" id="addButton">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 6V12M12 12V18M12 12H18M12 12H6" stroke="white" stroke-width="2" stroke-linecap="round"/>
                 </svg>
             </button>
-
+            
+            <!-- 添加记录模态框 -->
             <div class="modal" id="addModal">
                 <div class="modal-content">
                     <div class="modal-header">添加记录</div>
@@ -454,13 +708,13 @@
                             <input type="number" id="amount" placeholder="输入金额">
                         </div>
                         <div class="form-group">
-                            <label for="type">类型</label>
-                            <select id="type">
-                                <option value="收入-吃喝岭师">收入-吃喝岭师</option>
-                                <option value="收入-24个半">收入-24个半</option>
-                                <option value="费用-食材">费用-食材</option>
-                                <option value="费用-交通">费用-交通</option>
-                            </select>
+                            <label>类型</label>
+                            <div class="type-options" id="typeOptions">
+                                <div class="type-option" data-type="收入-吃喝岭师">收入-吃喝岭师</div>
+                                <div class="type-option" data-type="收入-24个半">收入-24个半</div>
+                                <div class="type-option" data-type="费用-食材">费用-食材</div>
+                                <div class="type-option" data-type="费用-交通">费用-交通</div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -471,7 +725,8 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- 密码重置模态框 -->
     <div class="modal" id="resetModal">
         <div class="reset-modal-content">
             <div class="modal-header">重置密码</div>
@@ -490,6 +745,7 @@
     </div>
 
     <script>
+        // 数据结构
         class Record {
             constructor(amount, type, date) {
                 this.id = Date.now().toString();
@@ -499,6 +755,7 @@
             }
         }
 
+        // Firebase配置
         const firebaseConfig = {
             apiKey: "AIzaSyDYY_Cex21vcQGR9beUvOniHxNeRqbpr6k",
             authDomain: "jizhang-e867a.firebaseapp.com",
@@ -510,17 +767,25 @@
             measurementId: "G-4R1MKP7G6S"
         };
 
+        // 初始化Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
+        
+        // 启用离线持久化
         database.goOnline();
-
+        
+        // 应用状态
         let records = [];
         let selectedDate = new Date().toISOString().split('T')[0];
         let currentUser = null;
         let isOnline = navigator.onLine;
+        let selectedType = null;
 
+        // DOM元素
         const datePicker = document.getElementById('datePicker');
+        const datePickerButton = document.getElementById('datePickerButton');
+        const dateDisplay = document.getElementById('dateDisplay');
         const incomeTotal = document.getElementById('incomeTotal');
         const expenseTotal = document.getElementById('expenseTotal');
         const profitTotal = document.getElementById('profitTotal');
@@ -528,20 +793,17 @@
         const addButton = document.getElementById('addButton');
         const addModal = document.getElementById('addModal');
         const amountInput = document.getElementById('amount');
-        const typeSelect = document.getElementById('type');
+        const typeOptions = document.getElementById('typeOptions');
         const cancelBtn = document.getElementById('cancelBtn');
         const saveBtn = document.getElementById('saveBtn');
         const loader = document.getElementById('loader');
         const loaderText = document.getElementById('loaderText');
         const authSection = document.getElementById('authSection');
-        const loginButton = document.getElementById('loginButton');
-        const logoutButton = document.getElementById('logoutButton');
+        const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const authError = document.getElementById('authError');
         const appContent = document.getElementById('appContent');
-        const exportBtn = document.getElementById('exportBtn');
-        const exportDropdown = document.getElementById('exportDropdown');
         const exportCsvBtn = document.getElementById('exportCsv');
         const exportExcelBtn = document.getElementById('exportExcel');
         const forgotPassword = document.getElementById('forgotPassword');
@@ -550,26 +812,34 @@
         const resetCancelBtn = document.getElementById('resetCancelBtn');
         const resetSubmitBtn = document.getElementById('resetSubmitBtn');
         const offlineNotice = document.getElementById('offlineNotice');
+        const logoutButton = document.getElementById('logoutButton');
 
+        // 显示/隐藏加载指示器
         function showLoader(show, text = "数据加载中...") {
             loaderText.textContent = text;
             loader.style.display = show ? 'flex' : 'none';
         }
 
+        // 更新网络状态
         function updateNetworkStatus() {
             isOnline = navigator.onLine;
             if (isOnline) {
                 offlineNotice.classList.remove('show');
-                if (currentUser) syncPendingChanges();
+                if (currentUser) {
+                    syncPendingChanges();
+                }
             } else {
                 offlineNotice.classList.add('show');
             }
         }
 
+        // 同步离线时的更改
         async function syncPendingChanges() {
             const pendingChanges = JSON.parse(localStorage.getItem('pendingChanges')) || [];
             if (pendingChanges.length === 0) return;
+            
             showLoader(true, "正在同步离线更改...");
+            
             try {
                 for (const change of pendingChanges) {
                     if (change.type === 'add') {
@@ -578,6 +848,7 @@
                         await database.ref(`users/${currentUser.uid}/records/${change.id}`).remove();
                     }
                 }
+                
                 localStorage.removeItem('pendingChanges');
                 await loadRecordsFromFirebase();
                 updateUI();
@@ -588,19 +859,23 @@
             }
         }
 
+        // 初始化
         async function init() {
             showLoader(true);
             datePicker.value = selectedDate;
-
+            dateDisplay.textContent = formatDate(selectedDate);
+            
             window.addEventListener('online', updateNetworkStatus);
             window.addEventListener('offline', updateNetworkStatus);
             updateNetworkStatus();
-
+            
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     currentUser = user;
+                    loginForm.style.display = 'none';
                     authSection.style.display = 'none';
                     appContent.style.display = 'block';
+                    
                     try {
                         await loadRecordsFromFirebase();
                         updateUI();
@@ -610,74 +885,76 @@
                     }
                 } else {
                     currentUser = null;
+                    loginForm.style.display = 'block';
                     authSection.style.display = 'block';
                     appContent.style.display = 'none';
                     records = [];
                 }
                 showLoader(false);
             });
-
+            
+            datePickerButton.addEventListener('click', () => {
+                datePicker.click();
+            });
+            
             datePicker.addEventListener('change', (e) => {
                 selectedDate = e.target.value;
+                dateDisplay.textContent = formatDate(selectedDate);
                 updateUI();
             });
-
+            
             addButton.addEventListener('click', () => {
                 if (!currentUser) return;
                 addModal.style.display = 'flex';
                 amountInput.focus();
+                selectedType = null;
+                updateTypeSelection();
             });
-
+            
             cancelBtn.addEventListener('click', () => {
                 addModal.style.display = 'none';
                 amountInput.value = '';
+                selectedType = null;
             });
-
+            
             saveBtn.addEventListener('click', saveRecord);
+            
             loginButton.addEventListener('click', handleLogin);
+            
             logoutButton.addEventListener('click', handleLogout);
-
-            exportBtn.addEventListener('click', () => {
-                exportDropdown.style.display = 
-                    exportDropdown.style.display === 'block' ? 'none' : 'block';
-            });
-
-            exportCsvBtn.addEventListener('click', () => {
-                exportToCsv();
-                exportDropdown.style.display = 'none';
-            });
-
-            exportExcelBtn.addEventListener('click', () => {
-                exportToExcel();
-                exportDropdown.style.display = 'none';
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!exportBtn.contains(e.target) && !exportDropdown.contains(e.target)) {
-                    exportDropdown.style.display = 'none';
-                }
-            });
-
+            
+            exportCsvBtn.addEventListener('click', exportToCsv);
+            exportExcelBtn.addEventListener('click', exportToExcel);
+            
             forgotPassword.addEventListener('click', () => {
                 resetModal.style.display = 'flex';
                 resetEmail.value = emailInput.value || '';
                 resetEmail.focus();
             });
-
+            
             resetCancelBtn.addEventListener('click', () => {
                 resetModal.style.display = 'none';
                 resetEmail.value = '';
             });
-
+            
             resetSubmitBtn.addEventListener('click', handlePasswordReset);
-
+            
+            typeOptions.addEventListener('click', (e) => {
+                const option = e.target.closest('.type-option');
+                if (option) {
+                    selectedType = option.dataset.type;
+                    updateTypeSelection();
+                }
+            });
+            
             addModal.addEventListener('click', (e) => {
                 if (e.target === addModal) {
                     addModal.style.display = 'none';
                     amountInput.value = '';
+                    selectedType = null;
                 }
             });
-
+            
             resetModal.addEventListener('click', (e) => {
                 if (e.target === resetModal) {
                     resetModal.style.display = 'none';
@@ -686,31 +963,81 @@
             });
 
             amountInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') saveRecord();
+                if (e.key === 'Enter') {
+                    saveRecord();
+                }
+            });
+            
+            resetEmail.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handlePasswordReset();
+                }
             });
 
-            resetEmail.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handlePasswordReset();
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                document.body.classList.add('standalone');
+            }
+        }
+
+        // 格式化日期显示
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
             });
         }
 
+        // 更新类型选择状态
+        function updateTypeSelection() {
+            const options = typeOptions.querySelectorAll('.type-option');
+            options.forEach(option => {
+                if (option.dataset.type === selectedType) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+
+        // 处理退出登录
+        async function handleLogout() {
+            try {
+                showLoader(true, "正在退出...");
+                await auth.signOut();
+            } catch (error) {
+                console.error("退出失败:", error);
+                authError.textContent = "退出失败，请重试";
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // 处理登录/注册
         async function handleLogin() {
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
+            
             if (!email || !password) {
                 authError.textContent = "请输入邮箱和密码";
                 return;
             }
+            
             showLoader(true, "正在登录...");
             authError.textContent = "";
+            
             try {
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (loginError) {
+                console.error("登录错误:", loginError);
+                
                 if (loginError.code === 'auth/user-not-found') {
                     try {
                         await auth.createUserWithEmailAndPassword(email, password);
                         authError.textContent = "注册成功，已自动登录";
                     } catch (signupError) {
+                        console.error("注册错误:", signupError);
                         authError.textContent = getAuthErrorMessage(signupError);
                     }
                 } else {
@@ -721,50 +1048,52 @@
             }
         }
 
+        // 处理密码重置
         async function handlePasswordReset() {
             const email = resetEmail.value.trim();
+            
             if (!email) {
                 authError.textContent = "请输入注册邮箱";
                 return;
             }
+            
             showLoader(true, "正在发送重置邮件...");
+            
             try {
                 await auth.sendPasswordResetEmail(email);
                 resetModal.style.display = 'none';
                 resetEmail.value = '';
                 authError.textContent = "密码重置邮件已发送，请检查您的邮箱";
             } catch (error) {
+                console.error("密码重置错误:", error);
                 authError.textContent = getAuthErrorMessage(error);
             } finally {
                 showLoader(false);
             }
         }
 
-        async function handleLogout() {
-            showLoader(true, "正在退出...");
-            try {
-                await auth.signOut();
-            } catch (error) {
-                console.error("退出登录失败:", error);
-            } finally {
-                showLoader(false);
-            }
-        }
-
+        // 获取认证错误信息
         function getAuthErrorMessage(error) {
             const errorMap = {
-                'auth/invalid-email': '邮箱格式不正确',
+                'auth/invalid-email': '邮箱格式不正确，请检查',
+                'auth/user-disabled': '账户已被禁用，请联系管理员',
                 'auth/user-not-found': '账户不存在，将尝试注册',
-                'auth/wrong-password': '密码错误',
-                'auth/email-already-in-use': '邮箱已被注册',
-                'auth/weak-password': '密码需至少6个字符',
-                'auth/too-many-requests': '尝试次数过多，请稍后重试'
+                'auth/wrong-password': '密码错误，请重试',
+                'auth/email-already-in-use': '邮箱已被注册，请直接登录',
+                'auth/weak-password': '密码强度不足(至少6个字符)',
+                'auth/operation-not-allowed': '未启用邮箱/密码登录，请检查Firebase配置',
+                'auth/too-many-requests': '尝试次数过多，请稍后再试',
+                'auth/network-request-failed': '网络连接失败，请检查网络',
+                'auth/missing-email': '请输入邮箱地址'
             };
+            
             return errorMap[error.code] || `操作失败: ${error.message}`;
         }
 
+        // 从Firebase加载数据
         async function loadRecordsFromFirebase() {
             if (!currentUser) return;
+            
             return new Promise((resolve, reject) => {
                 database.ref(`users/${currentUser.uid}/records`).once('value')
                     .then((snapshot) => {
@@ -773,32 +1102,42 @@
                         records.sort((a, b) => new Date(b.date) - new Date(a.date));
                         resolve();
                     })
-                    .catch((error) => reject(error));
+                    .catch((error) => {
+                        reject(error);
+                    });
             });
         }
 
+        // 更新UI
         function updateUI() {
             const filteredRecords = records.filter(record => record.date === selectedDate);
+            
             const dailyIncome = filteredRecords
                 .filter(record => record.type.startsWith('收入'))
                 .reduce((sum, record) => sum + record.amount, 0);
+                
             const dailyExpense = filteredRecords
                 .filter(record => record.type.startsWith('费用'))
                 .reduce((sum, record) => sum + record.amount, 0);
+                
             const dailyProfit = dailyIncome - dailyExpense;
-
+            
             incomeTotal.textContent = dailyIncome.toFixed(2);
             expenseTotal.textContent = dailyExpense.toFixed(2);
             profitTotal.textContent = dailyProfit.toFixed(2);
+            
             profitTotal.style.color = dailyProfit >= 0 ? 'var(--primary-green)' : 'var(--primary-red)';
+            
             renderRecords(filteredRecords);
         }
 
+        // 渲染记录列表
         function renderRecords(recordsToRender) {
             if (recordsToRender.length === 0) {
                 recordsList.innerHTML = '<div class="no-records">暂无记录</div>';
                 return;
             }
+            
             let html = '';
             recordsToRender.forEach(record => {
                 const isIncome = record.type.startsWith('收入');
@@ -814,29 +1153,46 @@
                     </div>
                 `;
             });
+            
             recordsList.innerHTML = html;
         }
 
+        // 保存记录
         async function saveRecord() {
             if (!currentUser) return;
+            
             const amount = amountInput.value.trim();
-            const type = typeSelect.value;
+            
             if (!amount || isNaN(amount)) {
                 alert('请输入有效的金额');
                 return;
             }
-            const newRecord = new Record(amount, type, selectedDate);
+            
+            if (!selectedType) {
+                alert('请选择记录类型');
+                return;
+            }
+            
+            const newRecord = new Record(amount, selectedType, selectedDate);
+            
             try {
                 showLoader(true, "正在保存...");
+                
                 if (isOnline) {
                     await database.ref(`users/${currentUser.uid}/records/${newRecord.id}`).set(newRecord);
                 } else {
                     const pendingChanges = JSON.parse(localStorage.getItem('pendingChanges')) || [];
-                    pendingChanges.push({ type: 'add', data: newRecord });
+                    pendingChanges.push({
+                        type: 'add',
+                        data: newRecord
+                    });
                     localStorage.setItem('pendingChanges', JSON.stringify(pendingChanges));
                 }
+                
                 records.push(newRecord);
+                
                 amountInput.value = '';
+                selectedType = null;
                 addModal.style.display = 'none';
                 updateUI();
             } catch (error) {
@@ -847,19 +1203,27 @@
             }
         }
 
+        // 删除记录
         async function deleteRecord(id) {
             if (!currentUser) return;
             if (!confirm('确定要删除这条记录吗？')) return;
+            
             try {
                 showLoader(true, "正在删除...");
+                
                 if (isOnline) {
                     await database.ref(`users/${currentUser.uid}/records/${id}`).remove();
                 } else {
                     const pendingChanges = JSON.parse(localStorage.getItem('pendingChanges')) || [];
-                    pendingChanges.push({ type: 'delete', id: id });
+                    pendingChanges.push({
+                        type: 'delete',
+                        id: id
+                    });
                     localStorage.setItem('pendingChanges', JSON.stringify(pendingChanges));
                 }
+                
                 records = records.filter(record => record.id !== id);
+                
                 updateUI();
             } catch (error) {
                 console.error("删除失败:", error);
@@ -869,21 +1233,27 @@
             }
         }
 
+        // 导出为CSV
         function exportToCsv() {
             if (records.length === 0) {
                 alert('没有可导出的记录');
                 return;
             }
+            
             const recordsToExport = selectedDate ? 
-                records.filter(record => record.date === selectedDate) : records;
+                records.filter(record => record.date === selectedDate) : 
+                records;
+            
             if (recordsToExport.length === 0) {
                 alert('选定日期没有记录');
                 return;
             }
+            
             let csv = '日期,类型,金额\n';
             recordsToExport.forEach(record => {
                 csv += `${record.date},${record.type},${record.amount.toFixed(2)}\n`;
             });
+            
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -893,30 +1263,43 @@
             link.click();
         }
 
+        // 导出为Excel
         function exportToExcel() {
             if (records.length === 0) {
                 alert('没有可导出的记录');
                 return;
             }
+            
             const recordsToExport = selectedDate ? 
-                records.filter(record => record.date === selectedDate) : records;
+                records.filter(record => record.date === selectedDate) : 
+                records;
+            
             if (recordsToExport.length === 0) {
                 alert('选定日期没有记录');
                 return;
             }
-            const data = [['日期', '类型', '金额'], ...recordsToExport.map(record => [
-                record.date,
-                record.type,
-                record.amount.toFixed(2)
-            ])];
+            
+            const data = [
+                ['日期', '类型', '金额'],
+                ...recordsToExport.map(record => [
+                    record.date,
+                    record.type,
+                    record.amount.toFixed(2)
+                ])
+            ];
+            
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(data);
             XLSX.utils.book_append_sheet(wb, ws, "记账数据");
+            
             const dateSuffix = selectedDate ? `_${selectedDate}` : '';
             XLSX.writeFile(wb, `记账数据${dateSuffix}_${new Date().toLocaleDateString()}.xlsx`);
         }
 
+        // 全局函数
         window.deleteRecord = deleteRecord;
+
+        // 启动应用
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
