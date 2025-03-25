@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <!-- PWA 必需标签 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#007AFF">
+
+<!-- iOS 额外支持 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="记账">
+<link rel="apple-touch-icon" href="icon.png">
+
+<!-- 安卓/通用 PWA 支持 -->
+<meta name="mobile-web-app-capable" content="yes">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日记账</title>
+    <style>
+        :root {
+            --income-color: #007AFF;
+            --expense-color: #FF3B30;
+            --profit-positive: #34C759;
+            --profit-negative: #FF9500;
+            --bg-color: #F2F2F7;
+            --card-color: #FFFFFF;
+            --text-primary: #000000;
+            --text-secondary: #8E8E93;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .date-picker {
+            margin-bottom: 20px;
+            background-color: var(--card-color);
+            padding: 12px 16px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .summary-title {
+            font-size: 17px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .summary-items {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .summary-item {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .summary-item-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .summary-item-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .records-title {
+            font-size: 17px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .records-list {
+            background-color: #000000;
+            color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .record-item {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+        }
+        
+        .record-item:last-child {
+            border-bottom: none;
+        }
+        
+        .record-type {
+            font-size: 16px;
+        }
+        
+        .record-amount.income {
+            color: var(--income-color);
+        }
+        
+        .record-amount.expense {
+            color: var(--expense-color);
+        }
+        
+        .no-records {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 20px;
+            font-size: 16px;
+        }
+        
+        .add-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--income-color);
+            color: white;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            display: none;
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: 16px;
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-body {
+            padding: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 16px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .btn-cancel {
+            background-color: transparent;
+            color: var(--text-secondary);
+            margin-right: 8px;
+        }
+        
+        .btn-save {
+            background-color: var(--income-color);
+            color: white;
+            border: none;
+        }
+        
+        .delete-btn {
+            color: var(--expense-color);
+            background: none;
+            border: none;
+            padding: 0 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">每日记账</div>
+        
+        <div class="date-picker">
+            <input type="date" id="datePicker" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        
+        <div class="summary-card">
+            <div class="summary-title">概览</div>
+            <div class="summary-items">
+                <div class="summary-item">
+                    <div class="summary-item-title">收入</div>
+                    <div class="summary-item-value" id="incomeTotal">0.00</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-item-title">费用</div>
+                    <div class="summary-item-value" id="expenseTotal">0.00</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-item-title">利润</div>
+                    <div class="summary-item-value" id="profitTotal">0.00</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="records-title">记录</div>
+        <div class="records-list" id="recordsList">
+            <div class="no-records">暂无记录</div>
+        </div>
+        
+        <button class="add-button" id="addButton">+</button>
+        
+        <div class="modal" id="addModal">
+            <div class="modal-content">
+                <div class="modal-header">添加记录</div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="amount">金额</label>
+                        <input type="number" id="amount" placeholder="输入金额">
+                    </div>
+                    <div class="form-group">
+                        <label for="type">类型</label>
+                        <select id="type">
+                            <option value="收入-吃喝岭师">收入-吃喝岭师</option>
+                            <option value="收入-24个半">收入-24个半</option>
+                            <option value="费用-食材">费用-食材</option>
+                            <option value="费用-交通">费用-交通</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-cancel" id="cancelBtn">取消</button>
+                    <button class="btn btn-save" id="saveBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据结构
+        class Record {
+            constructor(amount, type, date) {
+                this.id = Date.now().toString();
+                this.amount = parseFloat(amount);
+                this.type = type;
+                this.date = date;
+            }
+        }
+
+        // 应用状态
+        let records = JSON.parse(localStorage.getItem('financeRecords')) || [];
+        let selectedDate = new Date().toISOString().split('T')[0];
+
+        // DOM元素
+        const datePicker = document.getElementById('datePicker');
+        const incomeTotal = document.getElementById('incomeTotal');
+        const expenseTotal = document.getElementById('expenseTotal');
+        const profitTotal = document.getElementById('profitTotal');
+        const recordsList = document.getElementById('recordsList');
+        const addButton = document.getElementById('addButton');
+        const addModal = document.getElementById('addModal');
+        const amountInput = document.getElementById('amount');
+        const typeSelect = document.getElementById('type');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveBtn = document.getElementById('saveBtn');
+
+        // 初始化
+        function init() {
+            datePicker.value = selectedDate;
+            updateUI();
+            
+            // 事件监听
+            datePicker.addEventListener('change', (e) => {
+                selectedDate = e.target.value;
+                updateUI();
+            });
+            
+            addButton.addEventListener('click', () => {
+                addModal.style.display = 'flex';
+                amountInput.focus();
+            });
+            
+            cancelBtn.addEventListener('click', () => {
+                addModal.style.display = 'none';
+                amountInput.value = '';
+            });
+            
+            saveBtn.addEventListener('click', saveRecord);
+            
+            // 点击模态框外部关闭
+            addModal.addEventListener('click', (e) => {
+                if (e.target === addModal) {
+                    addModal.style.display = 'none';
+                    amountInput.value = '';
+                }
+            });
+        }
+
+        // 更新UI
+        function updateUI() {
+            const filteredRecords = records.filter(record => record.date === selectedDate);
+            
+            // 计算统计
+            const dailyIncome = filteredRecords
+                .filter(record => record.type.startsWith('收入'))
+                .reduce((sum, record) => sum + record.amount, 0);
+                
+            const dailyExpense = filteredRecords
+                .filter(record => record.type.startsWith('费用'))
+                .reduce((sum, record) => sum + record.amount, 0);
+                
+            const dailyProfit = dailyIncome - dailyExpense;
+            
+            // 更新统计
+            incomeTotal.textContent = dailyIncome.toFixed(2);
+            expenseTotal.textContent = dailyExpense.toFixed(2);
+            profitTotal.textContent = dailyProfit.toFixed(2);
+            
+            // 设置利润颜色
+            profitTotal.style.color = dailyProfit >= 0 ? 'var(--profit-positive)' : 'var(--profit-negative)';
+            
+            // 更新记录列表
+            renderRecords(filteredRecords);
+        }
+
+        // 渲染记录列表
+        function renderRecords(recordsToRender) {
+            if (recordsToRender.length === 0) {
+                recordsList.innerHTML = '<div class="no-records">暂无记录</div>';
+                return;
+            }
+            
+            let html = '';
+            recordsToRender.forEach(record => {
+                const isIncome = record.type.startsWith('收入');
+                html += `
+                    <div class="record-item" data-id="${record.id}">
+                        <span class="record-type">${record.type}</span>
+                        <span class="record-amount ${isIncome ? 'income' : 'expense'}">${record.amount.toFixed(2)}</span>
+                        <button class="delete-btn" onclick="deleteRecord('${record.id}')">删除</button>
+                    </div>
+                `;
+            });
+            
+            recordsList.innerHTML = html;
+        }
+
+        // 保存记录
+        function saveRecord() {
+            const amount = amountInput.value.trim();
+            const type = typeSelect.value;
+            
+            if (!amount || isNaN(amount)) {
+                alert('请输入有效的金额');
+                return;
+            }
+            
+            const newRecord = new Record(amount, type, selectedDate);
+            records.push(newRecord);
+            saveToLocalStorage();
+            
+            amountInput.value = '';
+            addModal.style.display = 'none';
+            updateUI();
+            
+            console.log('记录已保存:', newRecord);
+        }
+
+        // 删除记录
+        function deleteRecord(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                records = records.filter(record => record.id !== id);
+                saveToLocalStorage();
+                updateUI();
+                console.log('记录已删除');
+            }
+        }
+
+        // 保存到本地存储
+        function saveToLocalStorage() {
+            localStorage.setItem('financeRecords', JSON.stringify(records));
+        }
+
+        // 全局函数
+        window.deleteRecord = deleteRecord;
+
+        // 启动应用
+        init();
+    </script>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
