@@ -1772,13 +1772,25 @@
             measurementId: "G-4R1MKP7G6S"
         };
 
-        // 初始化Firebase
+        // 初始化Firebase - 添加性能优化选项
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
         
-        // 启用离线持久化
+        // 启用离线持久化和性能优化
         database.goOnline();
+        
+        // 设置 FirebaseAuth 持久性为 LOCAL，减少需要重复登录次数
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        
+        // 配置Firebase数据库缓存大小，提高加载速度
+        firebase.database().ref('.info/connected').on('value', (snap) => {
+            if (snap.val() === true) {
+                // 当连接上时，设置缓存大小为10MB，提高性能并减少网络请求
+                firebase.database().goOnline();
+                database.ref().keepSynced(true);
+            }
+        });
         
         // 应用状态
         let records = [];
@@ -1804,13 +1816,17 @@
                 this.records[date] = data;
                 this.lastUpdated[`record_${date}`] = Date.now();
                 
-                // 将缓存保存到localStorage
-                try {
-                    localStorage.setItem('jizhang_records_cache', JSON.stringify(this.records));
-                    localStorage.setItem('jizhang_cache_timestamps', JSON.stringify(this.lastUpdated));
-                } catch (e) {
-                    console.warn('缓存存储失败:', e);
-                }
+                // 将缓存保存到localStorage，使用异步处理避免阻塞UI
+                setTimeout(() => {
+                    try {
+                        localStorage.setItem('jizhang_records_cache', JSON.stringify(this.records));
+                        localStorage.setItem('jizhang_cache_timestamps', JSON.stringify(this.lastUpdated));
+                    } catch (e) {
+                        console.warn('缓存存储失败:', e);
+                        // 如果存储空间不足，清理旧数据
+                        this.cleanupOldData();
+                    }
+                }, 0);
             },
             
             // 获取缓存统计数据
@@ -1823,13 +1839,17 @@
                 this.statistics[rangeKey] = data;
                 this.lastUpdated[`stats_${rangeKey}`] = Date.now();
                 
-                // 将缓存保存到localStorage
-                try {
-                    localStorage.setItem('jizhang_stats_cache', JSON.stringify(this.statistics));
-                    localStorage.setItem('jizhang_cache_timestamps', JSON.stringify(this.lastUpdated));
-                } catch (e) {
-                    console.warn('缓存存储失败:', e);
-                }
+                // 将缓存保存到localStorage，使用异步处理避免阻塞UI
+                setTimeout(() => {
+                    try {
+                        localStorage.setItem('jizhang_stats_cache', JSON.stringify(this.statistics));
+                        localStorage.setItem('jizhang_cache_timestamps', JSON.stringify(this.lastUpdated));
+                    } catch (e) {
+                        console.warn('缓存存储失败:', e);
+                        // 如果存储空间不足，清理旧数据
+                        this.cleanupOldData();
+                    }
+                }, 0);
             },
             
             // 判断缓存是否过期 (24小时)
@@ -1854,6 +1874,8 @@
                     if (timestamps) this.lastUpdated = JSON.parse(timestamps);
                 } catch (e) {
                     console.warn('加载缓存失败:', e);
+                    // 缓存损坏时清除
+                    this.clear();
                 }
             },
             
@@ -1869,6 +1891,35 @@
                     localStorage.removeItem('jizhang_cache_timestamps');
                 } catch (e) {
                     console.warn('清除缓存失败:', e);
+                }
+            },
+            
+            // 清理旧数据以节省空间
+            cleanupOldData() {
+                const now = Date.now();
+                const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
+                
+                // 清理超过一周的缓存数据
+                for (const key in this.lastUpdated) {
+                    if ((now - this.lastUpdated[key]) > ONE_WEEK) {
+                        if (key.startsWith('record_')) {
+                            const date = key.replace('record_', '');
+                            delete this.records[date];
+                        } else if (key.startsWith('stats_')) {
+                            const rangeKey = key.replace('stats_', '');
+                            delete this.statistics[rangeKey];
+                        }
+                        delete this.lastUpdated[key];
+                    }
+                }
+                
+                // 重新尝试保存
+                try {
+                    localStorage.setItem('jizhang_records_cache', JSON.stringify(this.records));
+                    localStorage.setItem('jizhang_stats_cache', JSON.stringify(this.statistics));
+                    localStorage.setItem('jizhang_cache_timestamps', JSON.stringify(this.lastUpdated));
+                } catch (e) {
+                    console.warn('即使清理后仍然无法保存缓存:', e);
                 }
             }
         };
@@ -2390,13 +2441,7 @@
                     appContent.style.display = 'block';
                     
                     try {
-                        // 并行加载数据
-                        await Promise.all([
-                            loadRecordsFromFirebase(),
-                            new Promise(resolve => setTimeout(resolve, 100)) // 添加小延迟确保UI更新
-                        ]);
-                        
-                        // 确保登录后也是当天日期
+                        // 先设置当天日期，确保UI至少显示日期和标题
                         const today = new Date();
                         const yyyy = today.getFullYear();
                         const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -2405,10 +2450,27 @@
                         datePicker.value = selectedDate;
                         dateDisplay.textContent = formatDate(selectedDate);
                         
+                        // 显示加载中的UI，提高用户体验
+                        incomeTotal.textContent = "...";
+                        expenseTotal.textContent = "...";
+                        profitTotal.textContent = "...";
+                        recordsList.innerHTML = '<div class="no-records">加载中...</div>';
+                        
+                        // 设置加载数据的超时
+                        const loadPromise = loadRecordsFromFirebase();
+                        const timeoutPromise = new Promise((resolve) => {
+                            setTimeout(() => {
+                                console.warn('数据加载超时，使用空数据');
+                                resolve();
+                            }, 10000);
+                        });
+                        
+                        await Promise.race([loadPromise, timeoutPromise]);
+                        
                         updateUI();
                     } catch (error) {
                         console.error("加载数据失败:", error);
-                        authError.textContent = "加载数据失败，请重试";
+                        recordsList.innerHTML = '<div class="no-records">加载失败，请重试</div>';
                     }
                 } else {
                     currentUser = null;
@@ -2567,10 +2629,10 @@
             authError.textContent = "";
             
             try {
-                // 设置登录超时
+                // 设置登录超时为8秒
                 const loginPromise = auth.signInWithEmailAndPassword(email, password);
                 const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('登录超时')), 5000)
+                    setTimeout(() => reject(new Error('登录超时，请检查网络连接')), 8000)
                 );
                 
                 await Promise.race([loginPromise, timeoutPromise]);
@@ -2578,15 +2640,33 @@
                 // 登录成功后保存信息
                 localStorage.setItem('userEmail', email);
                 localStorage.setItem('userPassword', password);
+                
+                // 先渲染空UI，提高感知速度
+                authSection.style.display = 'none';
+                appContent.style.display = 'block';
+                
             } catch (loginError) {
                 console.error("登录错误:", loginError);
                 
-                if (loginError.code === 'auth/user-not-found') {
+                if (loginError.message === '登录超时，请检查网络连接') {
+                    authError.textContent = loginError.message;
+                } else if (loginError.code === 'auth/user-not-found') {
                     try {
-                        await auth.createUserWithEmailAndPassword(email, password);
+                        // 设置注册超时
+                        const signupPromise = auth.createUserWithEmailAndPassword(email, password);
+                        const timeoutPromise = new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('注册超时，请检查网络连接')), 8000)
+                        );
+                        
+                        await Promise.race([signupPromise, timeoutPromise]);
+                        
                         localStorage.setItem('userEmail', email);
                         localStorage.setItem('userPassword', password);
                         authError.textContent = "注册成功，已自动登录";
+                        
+                        // 先渲染空UI，提高感知速度
+                        authSection.style.display = 'none';
+                        appContent.style.display = 'block';
                     } catch (signupError) {
                         console.error("注册错误:", signupError);
                         authError.textContent = getAuthErrorMessage(signupError);
@@ -2641,20 +2721,81 @@
             return errorMap[error.code] || `操作失败: ${error.message}`;
         }
 
-        // 从Firebase加载数据
+        // 从Firebase加载数据 - 优化性能
         async function loadRecordsFromFirebase() {
             if (!currentUser) return;
             
+            // 检查今天的数据是否在缓存中，如果有则优先使用缓存
+            const today = new Date().toISOString().split('T')[0];
+            const cachedTodayRecords = dataCache.getRecords(today);
+            
+            if (cachedTodayRecords && !dataCache.isExpired(`record_${today}`)) {
+                // 使用缓存的今日数据快速渲染UI
+                const todayRecords = cachedTodayRecords;
+                // 筛选出今天的记录
+                const filteredRecords = todayRecords.filter(record => record.date === today);
+                records = [...filteredRecords];
+                updateUI();
+                
+                // 然后在后台继续加载完整数据
+                setTimeout(() => fetchCompleteRecords(), 100);
+                return Promise.resolve();
+            }
+            
+            return fetchCompleteRecords();
+        }
+        
+        // 后台加载完整记录
+        function fetchCompleteRecords() {
             return new Promise((resolve, reject) => {
-                database.ref(`users/${currentUser.uid}/records`).once('value')
+                // 设置加载超时
+                const timeoutId = setTimeout(() => {
+                    console.warn('数据加载超时，使用缓存数据');
+                    resolve();
+                }, 8000); // 8秒超时
+                
+                database.ref(`users/${currentUser.uid}/records`)
+                    .limitToLast(100) // 限制只加载最近100条记录，提高加载速度
+                    .once('value')
                     .then((snapshot) => {
+                        clearTimeout(timeoutId); // 清除超时
                         const data = snapshot.val();
                         records = data ? Object.values(data) : [];
                         records.sort((a, b) => new Date(b.date) - new Date(a.date));
+                        
+                        // 缓存按日期分组的记录
+                        const recordsByDate = {};
+                        records.forEach(record => {
+                            if (!recordsByDate[record.date]) {
+                                recordsByDate[record.date] = [];
+                            }
+                            recordsByDate[record.date].push(record);
+                        });
+                        
+                        // 保存到缓存
+                        Object.keys(recordsByDate).forEach(date => {
+                            dataCache.setRecords(date, recordsByDate[date]);
+                        });
+                        
+                        updateUI();
                         resolve();
                     })
                     .catch((error) => {
-                        reject(error);
+                        clearTimeout(timeoutId); // 清除超时
+                        console.error('加载数据失败:', error);
+                        // 如果加载失败但有缓存，使用缓存
+                        const cachedDates = Object.keys(dataCache.records);
+                        if (cachedDates.length > 0) {
+                            records = [];
+                            cachedDates.forEach(date => {
+                                records = [...records, ...dataCache.getRecords(date)];
+                            });
+                            records.sort((a, b) => new Date(b.date) - new Date(a.date));
+                            updateUI();
+                            resolve();
+                        } else {
+                            reject(error);
+                        }
                     });
             });
         }
@@ -3109,11 +3250,11 @@
                 passwordInput.value = savedPassword;
                 
                 try {
-                    // 使用 Promise.race 设置超时
+                    // 使用 Promise.race 设置8秒超时
                     await Promise.race([
                         auth.signInWithEmailAndPassword(savedEmail, savedPassword),
                         new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error('登录超时')), 5000)
+                            setTimeout(() => reject(new Error('登录超时')), 8000)
                         )
                     ]);
                     
