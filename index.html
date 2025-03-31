@@ -1786,9 +1786,9 @@
         // 配置Firebase数据库缓存大小，提高加载速度
         firebase.database().ref('.info/connected').on('value', (snap) => {
             if (snap.val() === true) {
-                // 当连接上时，设置缓存大小为10MB，提高性能并减少网络请求
-                firebase.database().goOnline();
-                database.ref().keepSynced(true);
+              console.log('已连接到 Firebase 服务器');
+            } else {
+              console.log('与 Firebase 服务器断开连接');
             }
         });
         
